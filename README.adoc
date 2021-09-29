@@ -1,0 +1,55 @@
+= Scrobbles4j
+:sectanchors:
+
+[abstract]
+--
+A set of modules around tracking, displaying and analyzing musical habits ("scrobbling") via Java.
+--
+
+== Requirements
+
+=== For building the project
+
+* JDK 17
+
+=== For using the client
+
+* An Apple macOS device, running iTunes, Apple Music or the Spotify app.
+
+
+== Building and running
+
+=== Build the whole project
+
+.On Linux or macOS
+[source,bash]
+----
+./mvnw clean verify
+----
+
+.On Windows
+[source,bash]
+----
+mvnw.cmd clean verify
+----
+
+=== Run the client with the desired sources and sinks
+
+[source,bash]
+----
+java \
+-p model/target/modules:\
+client/app/target/modules:\
+client/sources/api/target/modules:\
+client/sources/apple.music/target/modules \
+-m scrobbles4j.client.app/scrobbles4j.client.app.Launcher
+----
+
+Or use a prebuild binary will all available sources and sinks:
+
+[source,bash]
+----
+./client/bundle/target/maven-jlink/default/bin/scrobbles4j
+----
+
+The Maven command above also creates a ZIP-Bundle, find it under `./client/bundle/target/scrobbles4j.zip`.

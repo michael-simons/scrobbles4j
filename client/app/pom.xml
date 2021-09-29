@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>eu.michael-simons.scrobbles4j</groupId>
+		<artifactId>scrobbles4j.client</artifactId>
+		<version>1-ea</version>
+	</parent>
+
+	<artifactId>scrobbles4j.client.app</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>eu.michael-simons.scrobbles4j</groupId>
+			<artifactId>scrobbles4j.client.sources.api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration combine.self="append">
+					<archive>
+						<manifest>
+							<mainClass>scrobbles4j.client.app.Launcher</mainClass>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
