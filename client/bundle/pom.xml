@@ -19,6 +19,16 @@
 		</dependency>
 		<dependency>
 			<groupId>eu.michael-simons.scrobbles4j</groupId>
+			<artifactId>scrobbles4j.client.sinks.logger</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.michael-simons.scrobbles4j</groupId>
+			<artifactId>scrobbles4j.client.sources.apple.itunes</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.michael-simons.scrobbles4j</groupId>
 			<artifactId>scrobbles4j.client.sources.apple.music</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -26,7 +36,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jlink-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>

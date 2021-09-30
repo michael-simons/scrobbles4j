@@ -40,8 +40,8 @@ mvnw.cmd clean verify
 java \
 -p model/target/modules:\
 client/app/target/modules:\
-client/sources/api/target/modules:\
-client/sources/apple.music/target/modules \
+client/sources/apple.music/target/modules:\
+client/sinks/logger/target/modules \
 -m scrobbles4j.client.app/scrobbles4j.client.app.Launcher
 ----
 
@@ -53,3 +53,24 @@ Or use a prebuild binary will all available sources and sinks:
 ----
 
 The Maven command above also creates a ZIP-Bundle, find it under `./client/bundle/target/scrobbles4j.zip`.
+
+=== Run the server
+
+This will bring up MariaDB inside a container:
+
+[source,bash]
+----
+./mvnw quarkus:dev
+----
+
+To point it to your own instance run:
+
+[source,bash]
+----
+./mvnw quarkus:dev \
+  -Dquarkus.datasource.jdbc.url=jdbc:mariadb://127.0.0.1:3306/music\?useJDBCCompliantTimezoneShift=true\&useUnicode=true\&serverTimezone=UTC\&useGmtMillisForDatetimes=true\&useLegacyDatetimeCode=false\&useTimezone=true \
+  -Dquarkus.datasource.username=root \
+  -Dquarkus.datasource.password=secret
+----
+
+One live instance is here: http://charts.michael-simons.eu
