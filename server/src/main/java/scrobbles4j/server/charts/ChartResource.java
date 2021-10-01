@@ -15,18 +15,26 @@
  */
 package scrobbles4j.server.charts;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
+import scrobbles4j.model.Artist;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("/charts")
 public class ChartResource {
@@ -37,15 +45,19 @@ public class ChartResource {
 
 	private final Template overview;
 
+	private final Template artist;
+
 	@Inject
 	public ChartResource(
 		ChartService chartService,
 		@Location("charts/index") Template index,
-		@Location("charts/overview") Template overview
+		@Location("charts/overview") Template overview,
+		@Location("charts/artist") Template artist
 	) {
 		this.chartService = chartService;
 		this.index = index;
 		this.overview = overview;
+		this.artist = artist;
 	}
 
 	@GET
@@ -60,13 +72,30 @@ public class ChartResource {
 	@GET
 	@Path("/{year: (\\d+)}")
 	@Produces(MediaType.TEXT_HTML)
-	public TemplateInstance year(
-		@PathParam("year") int year
-	) {
+	public TemplateInstance year(@PathParam("year") int year) {
+
 		return overview
 			.data("year", year)
-			.data("topTracks", this.chartService.getTopNTracks(5, Optional.of(year)))
+			.data("topTracks", this.chartService.getTopNTracks(5, Optional.of(year), Optional.empty()))
 			.data("topAlbums", this.chartService.getTopNAlbums(10, year))
 			.data("topArtists", this.chartService.getTopNArtists(10, year));
+	}
+
+	@GET
+	@Path("/artist")
+	@Produces(MediaType.TEXT_HTML)
+	public TemplateInstance artist(@QueryParam("q") String q) {
+
+		var artist = Optional.ofNullable(q).map(String::trim).filter(Predicate.not(String::isBlank)).map(Artist::new)
+			.orElseThrow(() -> new WebApplicationException(Response.status(BAD_REQUEST).entity("Query parameter is mandatory.").build()));
+
+		var topTracks = this.chartService.getTopNTracks(20, Optional.empty(), Optional.of(artist));
+		if (topTracks.isEmpty()) {
+			throw new WebApplicationException(Response.status(NOT_FOUND).entity("No such artist.").build());
+		}
+
+		return this.artist
+			.data("artist", topTracks.stream().findFirst().map(t -> new Artist(t.artist())).get())
+			.data("topTracks", topTracks);
 	}
 }

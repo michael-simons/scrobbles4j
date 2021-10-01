@@ -30,7 +30,7 @@
                     {#for entry in topTracks}
                     <tr>
                         <th scope="row">{rankFormatter.format(entry.rank)}</th>
-                        <td>{entry.artist}</td>
+                        <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
                         <td>{entry.name}</td>
                         <td>{entry.cnt}</td>
                     </tr>
@@ -53,7 +53,7 @@
                     {#for entry in topAlbums}
                     <tr>
                         <th scope="row">{rankFormatter.format(entry.rank)}</th>
-                        <td>{entry.artist}</td>
+                        <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
                         <td>{entry.name}</td>
                     </tr>
                     {/for}
@@ -74,7 +74,7 @@
                     {#for entry in topArtists}
                     <tr>
                         <th scope="row">{rankFormatter.format(entry.rank)}</th>
-                        <td>{entry.name}</td>
+                        <td><a href="/charts/artist?q={str:urlEncode(entry.name)}">{entry.name}</a></td>
                     </tr>
                     {/for}
                     {/let}

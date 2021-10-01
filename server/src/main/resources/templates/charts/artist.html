@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Charts | {artist}</title>
+        <link rel="stylesheet" href="/scrobbles4j.css">
+    </head>
+    <body>
+        <nav>
+            <ul>
+                <li><a href="/">Start</a></li>
+                <li><a href="/charts">Charts</a></li>
+                <li>{artist.name}</li>
+            </ul>
+        </nav>
+
+        <main>
+            <h2>Top 20 Tracks by {artist.name}</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Rank</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Number of times played</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#let rankFormatter=inject:rankFormatter.get()}
+                    {#for entry in topTracks}
+                    <tr>
+                        <th scope="row">{rankFormatter.format(entry.rank)}</th>
+                        <td>{entry.name}</td>
+                        <td>{entry.cnt}</td>
+                    </tr>
+                    {/for}
+                    {/let}
+                </tbody>
+            </table>
+        </main>
+        <footer>
+            <p>
+                Powered by <a href="https://github.com/michael-simons/scrobbles4j">Scrobbles4j</a>
+            </p>
+        </footer>
+    </body>
+</html>

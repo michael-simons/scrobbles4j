@@ -15,6 +15,8 @@
  */
 package scrobbles4j.server.charts;
 
+import scrobbles4j.model.Artist;
+
 import java.sql.Types;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -90,11 +92,11 @@ final class ChartService {
 	 * The top n tracks without restrictions of a year.
 	 * @param maxRank The maximum rank to be included 
 	 * @return A list of chart entries for tracks
-	 * @see  #getTopNTracks(int, Optional)
+	 * @see  #getTopNTracks(int, Optional, Optional)
 	 */
 	Collection<EntryTrack> getTopNTracks(int maxRank) {
 
-		return getTopNTracks(maxRank, Optional.empty());
+		return getTopNTracks(maxRank, Optional.empty(), Optional.empty());
 	}
 
 	/**
@@ -102,7 +104,7 @@ final class ChartService {
 	 * @param year    An optional year in which the entries had been play
 	 * @return A list of chart entries for tracks
 	 */
-	Collection<EntryTrack> getTopNTracks(int maxRank, Optional<Integer> year) {
+	Collection<EntryTrack> getTopNTracks(int maxRank, Optional<Integer> year, Optional<Artist> artist) {
 
 		var statement = """
 			SELECT * FROM (
@@ -114,6 +116,7 @@ final class ChartService {
 			  JOIN tracks t ON t.id = p.track_id
 			  JOIN artists a ON a.id = t.artist_id
 			  WHERE (:year IS NULL OR year(p.played_on) = :year)
+			    AND (:artist IS NULL OR lower(a.artist) = lower(:artist))
 			  GROUP BY a.artist, t.name
 			) src
 			WHERE rank <= :maxRank
@@ -122,7 +125,9 @@ final class ChartService {
 
 		return this.db.withHandle(handle -> {
 			var query = handle.createQuery(statement);
-			return year.map(y -> query.bind("year", year)).orElseGet(() -> query.bindNull("year", Types.INTEGER))
+			year.ifPresentOrElse(value -> query.bind("year", value), () -> query.bindNull("year", Types.INTEGER));
+			artist.map(Artist::name).ifPresentOrElse(value -> query.bind("artist", value), () -> query.bindNull("artist", Types.CHAR));
+			return query
 				.bind("maxRank", maxRank)
 				.map((rs, ctx) -> new EntryTrack(rs.getInt("rank"), rs.getInt("cnt"), rs.getString("artist"),
 					rs.getString("name")))

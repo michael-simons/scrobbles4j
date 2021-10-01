@@ -29,7 +29,7 @@
                     {#for entry in topTracks}
                     <tr>
                         <th scope="row">{rankFormatter.format(entry.rank)}</th>
-                        <td>{entry.artist}</td>
+                        <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
                         <td>{entry.name}</td>
                         <td>{entry.cnt}</td>
                     </tr>
@@ -52,13 +52,15 @@
                     <tr>
                         <th colspan="3"><a href="/charts/{year.key}">{year.key}</a></th>
                     </tr>
+                    {#let rankFormatter=inject:rankFormatter.get()}
                     {#for entry in year.value}
                     <tr>
-                        <td>{entry.name}</td>
-                        <td>{entry.rank}</td>
+                        <td><a href="/charts/artist?q={str:urlEncode(entry.name)}">{entry.name}</a></td>
+                        <td>{rankFormatter.format(entry.rank)}</td>
                         <td>{entry.change}</td>
                     </tr>
                     {/for}
+                    {/let}
                 </tbody>
                 {/for}
             </table>
