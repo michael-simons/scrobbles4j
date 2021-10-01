@@ -73,7 +73,7 @@ public final class AppleMusic implements Source {
 			trackHandle.getAlbum(),
 			trackHandle.getName(),
 			trackHandle.getYear(),
-			trackHandle.getDuration(),
+			Math.toIntExact(Math.round(trackHandle.getDuration())),
 			trackHandle.getRating(),
 			trackHandle.getComment(),
 			new TrackNumber(trackHandle.getTrackNumber(), trackHandle.getTrackCount()),

@@ -13,28 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scrobbles4j.server.config;
+package scrobbles4j.server.util;
 
-import javax.enterprise.inject.Produces;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+
+import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.sql.DataSource;
-
-import org.jdbi.v3.core.Jdbi;
 
 /**
- * Creates a global instance of {@link Jdbi} based on the one {@link DataSource}.
- *
  * @author Michael J. Simons
  */
-public final class JdbiProducer {
+public final class RankFormatter {
 
-	/**
-	 * @param dataSource The datasource for which Jdbi should be produced
-	 * @return a Jdbi instance
-	 */
-	@Produces
+	@Named("rankFormatter")
 	@Singleton
-	public Jdbi jdbi(DataSource dataSource) {
-		return Jdbi.create(dataSource);
+	public static class RankFormatterSupplier implements Supplier<RankFormatter> {
+
+		@Override
+		public RankFormatter get() {
+			return new RankFormatter();
+		}
+	}
+
+	private final AtomicInteger previous = new AtomicInteger();
+
+	private RankFormatter() {
+	}
+
+	public String format(int rank) {
+
+		if (previous.compareAndSet(rank - 1, rank)) {
+			return Integer.toString(rank);
+		}
+		return "";
 	}
 }

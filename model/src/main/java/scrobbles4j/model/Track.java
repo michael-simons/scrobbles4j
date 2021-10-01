@@ -26,7 +26,7 @@ public record Track(
 	String album,
 	String name,
 	Integer year,
-	Double duration,
+	Integer duration,
 	Integer rating,
 	String comment,
 	TrackNumber tracknumber,

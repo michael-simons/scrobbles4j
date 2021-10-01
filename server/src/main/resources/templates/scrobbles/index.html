@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Scrobbles4j</title>
+        <link rel="stylesheet" href="/scrobbles4j.css">
+    </head>
+    <body>
+        <nav>
+            <ul>
+                <li><a href="/">Start</a></li>
+                <li><a href="/charts">Charts</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <h2>Latest scrobbles</h2>
+
+            {#if lastScrobbles.empty }
+            <p>Nothing has been scrobbled the last month.</p>
+            {#else}
+            <ol>
+                {#for playedTrack in lastScrobbles}
+                {#with playedTrack}
+                <li>
+                    <span class="track">"{track.name}"</span> by <span class="artist">{track.artist.name}</span> from
+                    the album <span class="album">"{track.album}"</span>
+                    at {playedOn.format('dd/MM/yyyy, HH:mm', locale, zone)}
+                </li>
+                {/with}
+                {/for}
+            </ol>
+            {/if}
+
+            <p>Have a look at the <a href="/charts">charts</a>, too.
+        </main>
+        <footer>
+            <p>
+                Powered by <a href="https://github.com/michael-simons/scrobbles4j">Scrobbles4j</a>
+            </p>
+        </footer>
+    </body>
+</html>

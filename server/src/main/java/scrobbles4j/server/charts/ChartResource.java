@@ -19,6 +19,8 @@ import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -47,21 +49,23 @@ public class ChartResource {
 	}
 
 	@GET
+	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance index() {
 
 		return index
+			.data("topTracks", this.chartService.getTopNTracks(10))
 			.data("favoriteArtists", this.chartService.getFavoriteArtistsByYears(5, 10));
 	}
 
 	@GET
 	@Path("/{year: (\\d+)}")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance year(
 		@PathParam("year") int year
 	) {
 		return overview
 			.data("year", year)
-			.data("topTracks", this.chartService.getTopNTracks(5, year))
+			.data("topTracks", this.chartService.getTopNTracks(5, Optional.of(year)))
 			.data("topAlbums", this.chartService.getTopNAlbums(10, year))
 			.data("topArtists", this.chartService.getTopNArtists(10, year));
 	}

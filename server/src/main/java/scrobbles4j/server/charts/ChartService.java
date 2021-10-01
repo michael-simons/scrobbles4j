@@ -15,16 +15,18 @@
  */
 package scrobbles4j.server.charts;
 
+import java.sql.Types;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.jdbi.v3.core.Jdbi;
 
@@ -33,23 +35,23 @@ import org.jdbi.v3.core.Jdbi;
  *
  * @author Michael J. Simons
  */
-@ApplicationScoped
-class ChartService {
+@Singleton
+final class ChartService {
 
 	private final Jdbi db;
 
-	@SuppressWarnings("CdiUnproxyableBeanTypesInspection")
-	@Inject ChartService(Jdbi db) {
+	@Inject
+	ChartService(Jdbi db) {
 		this.db = db;
 	}
 
 	Map<Integer, List<EntryArtist>> getFavoriteArtistsByYears(int maxRank, int numYears) {
 
-		var query = """
+		var statement = """
 			WITH rank_per_year AS (
 			  SELECT year(p.played_on) as year,
-					 a.artist,
-					 dense_rank() OVER (partition by year(played_on) ORDER BY count(*) DESC) AS rank
+			         a.artist,
+			         dense_rank() OVER (partition by year(played_on) ORDER BY count(*) DESC) AS rank
 			  FROM plays p
 			  JOIN tracks t ON t.id = p.track_id
 			  JOIN artists a ON a.id = t.artist_id
@@ -58,23 +60,23 @@ class ChartService {
 			  GROUP BY year(p.played_on), a.artist
 			)
 			SELECT year, artist, rank,
-				   ifnull(
-					 lag(rank) OVER (partition by artist ORDER by year ASC) - rank,
-					 'new'
-				   )  as `change`
+			       ifnull(
+			         lag(rank) OVER (partition by artist ORDER by year ASC) - rank,
+			         'new'
+				     )  as `change`
 			FROM rank_per_year
 			WHERE rank <= :maxRank
 			ORDER BY year DESC, rank ASC
 			""";
 
 		var currentYear = ZonedDateTime.now().getYear();
-		return this.db.withHandle(handle -> handle.createQuery(query)
+		return this.db.withHandle(handle -> handle.createQuery(statement)
 			.bind("maxRank", maxRank)
 			.bind("minYear", currentYear - numYears)
 			.bind("maxYear", currentYear)
 			.scanResultSet((resultSetSupplier, ctx) -> {
 				var result = new LinkedHashMap<Integer, List<EntryArtist>>();
-				try (ctx; var rs = resultSetSupplier.get();) {
+				try (ctx; var rs = resultSetSupplier.get()) {
 					while (rs.next()) {
 						var year = result.computeIfAbsent(rs.getInt("year"), k -> new ArrayList<>());
 						year.add(new EntryArtist(rs.getInt("rank"), rs.getString("artist"), rs.getString("change")));
@@ -85,34 +87,47 @@ class ChartService {
 	}
 
 	/**
+	 * The top n tracks without restrictions of a year.
+	 * @param maxRank The maximum rank to be included 
+	 * @return A list of chart entries for tracks
+	 * @see  #getTopNTracks(int, Optional)
+	 */
+	Collection<EntryTrack> getTopNTracks(int maxRank) {
+
+		return getTopNTracks(maxRank, Optional.empty());
+	}
+
+	/**
 	 * @param maxRank The maximum rank to be included
-	 * @param year    The year in which the entries had been play
+	 * @param year    An optional year in which the entries had been play
 	 * @return A list of chart entries for tracks
 	 */
-	Collection<EntryTrack> getTopNTracks(int maxRank, int year) {
+	Collection<EntryTrack> getTopNTracks(int maxRank, Optional<Integer> year) {
 
-		var query = """
+		var statement = """
 			SELECT * FROM (
 			  SELECT dense_rank() OVER (ORDER BY count(*) DESC) AS rank,
-				 count(*) as cnt,
-				 a.artist,
-				 t.name
+			         count(*) as cnt,
+			         a.artist,
+			         t.name
 			  FROM plays p
 			  JOIN tracks t ON t.id = p.track_id
 			  JOIN artists a ON a.id = t.artist_id
-			  WHERE year(p.played_on) = :year
+			  WHERE (:year IS NULL OR year(p.played_on) = :year)
 			  GROUP BY a.artist, t.name
 			) src
 			WHERE rank <= :maxRank
 			ORDER BY rank ASC
 			""";
 
-		return this.db.withHandle(handle -> handle.createQuery(query)
-			.bind("maxRank", maxRank)
-			.bind("year", year)
-			.map((rs, ctx) -> new EntryTrack(rs.getInt("rank"), rs.getInt("cnt"), rs.getString("artist"),
-				rs.getString("name")))
-			.collect(Collectors.toList()));
+		return this.db.withHandle(handle -> {
+			var query = handle.createQuery(statement);
+			return year.map(y -> query.bind("year", year)).orElseGet(() -> query.bindNull("year", Types.INTEGER))
+				.bind("maxRank", maxRank)
+				.map((rs, ctx) -> new EntryTrack(rs.getInt("rank"), rs.getInt("cnt"), rs.getString("artist"),
+					rs.getString("name")))
+				.collect(Collectors.toList());
+		});
 	}
 
 	/**
@@ -122,11 +137,11 @@ class ChartService {
 	 */
 	Collection<EntryAlbum> getTopNAlbums(int maxRank, int year) {
 
-		var query = """
+		var statement = """
 			SELECT * FROM (
 			  SELECT dense_rank() OVER (ORDER BY count(*) DESC) AS rank,
-					 a.artist,
-					 t.album
+			         a.artist,
+			         t.album
 			  FROM plays p
 			  JOIN tracks t ON t.id = p.track_id
 			  JOIN artists a ON a.id = t.artist_id
@@ -138,7 +153,7 @@ class ChartService {
 			ORDER BY rank ASC;
 			""";
 
-		return this.db.withHandle(handle -> handle.createQuery(query)
+		return this.db.withHandle(handle -> handle.createQuery(statement)
 			.bind("maxRank", maxRank)
 			.bind("year", year)
 			.map((rs, ctx) -> new EntryAlbum(rs.getInt("rank"), rs.getString("artist"), rs.getString("album")))
@@ -152,10 +167,10 @@ class ChartService {
 	 */
 	Collection<EntryArtist> getTopNArtists(int maxRank, int year) {
 
-		var query = """
+		var statement = """
 			SELECT * FROM (
 			  SELECT dense_rank() OVER (ORDER BY count(*) DESC) AS rank,
-					 a.artist
+			         a.artist
 			  FROM plays p
 			  JOIN tracks t ON t.id = p.track_id
 			  JOIN artists a ON a.id = t.artist_id
@@ -167,7 +182,7 @@ class ChartService {
 			ORDER BY rank ASC;
 			""";
 
-		return this.db.withHandle(handle -> handle.createQuery(query)
+		return this.db.withHandle(handle -> handle.createQuery(statement)
 			.bind("maxRank", maxRank)
 			.bind("year", year)
 			.map((rs, ctx) -> new EntryArtist(rs.getInt("rank"), rs.getString("artist")))

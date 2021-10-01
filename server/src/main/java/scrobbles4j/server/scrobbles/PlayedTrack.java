@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scrobbles4j.server;
+package scrobbles4j.server.scrobbles;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import scrobbles4j.model.Track;
 
-@Path("/")
-public class IndexResource {
+import java.time.Instant;
 
-	@GET
-	public Response forward(@Context UriInfo uriInfo) {
-
-		var newUri = uriInfo.getRequestUriBuilder().path("/charts").build();
-		return Response.seeOther(newUri).build();
-	}
+/**
+ * A played track.
+ *
+ * @author Michael J. Simons
+ */
+public record PlayedTrack(Track track, Instant playedOn) {
 }
