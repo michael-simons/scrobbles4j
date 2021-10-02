@@ -25,10 +25,10 @@ import org.junit.jupiter.api.Test;
  */
 class RankFormatterTest {
 
+	private final RankFormatter.RankFormatterSupplier supplier = new RankFormatter.RankFormatterSupplier();
+
 	@Nested
 	class RankFormatterSupplierTest {
-
-		private final RankFormatter.RankFormatterSupplier supplier = new RankFormatter.RankFormatterSupplier();
 
 		@Test
 		void supplierShouldGiveOutFreshFormatters() {
@@ -41,7 +41,7 @@ class RankFormatterTest {
 	@Test
 	void shouldOnlyChangeOnDifferentSuccessiveValues() {
 
-		var formatter = new RankFormatter.RankFormatterSupplier().get();
+		var formatter = supplier.get();
 
 		assertThat(formatter.format(0)).isEqualTo("");
 

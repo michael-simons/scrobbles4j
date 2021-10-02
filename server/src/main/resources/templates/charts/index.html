@@ -38,7 +38,29 @@
                 </tbody>
             </table>
 
-            <h2>Favorite artist in the last decade</h2>
+            <h2>Top 10 Albums overall</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Rank</th>
+                        <th scope="col">Artist</th>
+                        <th scope="col">Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#let rankFormatter=inject:rankFormatter.get()}
+                    {#for entry in topAlbums}
+                    <tr>
+                        <th scope="row">{rankFormatter.format(entry.rank)}</th>
+                        <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
+                        <td>{entry.name}</td>
+                    </tr>
+                    {/for}
+                    {/let}
+                </tbody>
+            </table>
+
+            <h2>Favorite artists per year in the last decade</h2>
             <table class="table">
                 <thead>
                     <tr>

@@ -18,6 +18,7 @@ package scrobbles4j.server.charts;
 import scrobbles4j.model.Artist;
 
 import java.sql.Types;
+import java.time.Year;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.Query;
 
 /**
  * This service is responsible for retrieving chart data via SQL from a datasource.
@@ -89,22 +91,11 @@ final class ChartService {
 	}
 
 	/**
-	 * The top n tracks without restrictions of a year.
-	 * @param maxRank The maximum rank to be included 
-	 * @return A list of chart entries for tracks
-	 * @see  #getTopNTracks(int, Optional, Optional)
-	 */
-	Collection<EntryTrack> getTopNTracks(int maxRank) {
-
-		return getTopNTracks(maxRank, Optional.empty(), Optional.empty());
-	}
-
-	/**
 	 * @param maxRank The maximum rank to be included
 	 * @param year    An optional year in which the entries had been play
 	 * @return A list of chart entries for tracks
 	 */
-	Collection<EntryTrack> getTopNTracks(int maxRank, Optional<Integer> year, Optional<Artist> artist) {
+	Collection<EntryTrack> getTopNTracks(int maxRank, Optional<Year> year, Optional<Artist> artist) {
 
 		var statement = """
 			SELECT * FROM (
@@ -125,7 +116,7 @@ final class ChartService {
 
 		return this.db.withHandle(handle -> {
 			var query = handle.createQuery(statement);
-			year.ifPresentOrElse(value -> query.bind("year", value), () -> query.bindNull("year", Types.INTEGER));
+			year.map(Year::getValue).ifPresentOrElse(value -> query.bind("year", value), () -> query.bindNull("year", Types.INTEGER));
 			artist.map(Artist::name).ifPresentOrElse(value -> query.bind("artist", value), () -> query.bindNull("artist", Types.CHAR));
 			return query
 				.bind("maxRank", maxRank)
@@ -140,7 +131,7 @@ final class ChartService {
 	 * @param year    The year in which the entries had been play
 	 * @return A list of chart entries for albums
 	 */
-	Collection<EntryAlbum> getTopNAlbums(int maxRank, int year) {
+	Collection<EntryAlbum> getTopNAlbums(int maxRank, Optional<Year> year) {
 
 		var statement = """
 			SELECT * FROM (
@@ -150,7 +141,7 @@ final class ChartService {
 			  FROM plays p
 			  JOIN tracks t ON t.id = p.track_id
 			  JOIN artists a ON a.id = t.artist_id
-			  WHERE year(p.played_on) = :year
+			  WHERE (:year IS NULL OR year(p.played_on) = :year)
 			    AND t.compilation = 'f'
 			  GROUP BY a.artist, t.album
 			) src
@@ -158,11 +149,14 @@ final class ChartService {
 			ORDER BY rank ASC;
 			""";
 
-		return this.db.withHandle(handle -> handle.createQuery(statement)
-			.bind("maxRank", maxRank)
-			.bind("year", year)
-			.map((rs, ctx) -> new EntryAlbum(rs.getInt("rank"), rs.getString("artist"), rs.getString("album")))
-			.collect(Collectors.toList()));
+		return this.db.withHandle(handle -> {
+			var query = handle.createQuery(statement);
+			year.map(Year::getValue).ifPresentOrElse(value -> query.bind("year", value), () -> query.bindNull("year", Types.INTEGER));
+			return query
+				.bind("maxRank", maxRank)
+				.map((rs, ctx) -> new EntryAlbum(rs.getInt("rank"), rs.getString("artist"), rs.getString("album")))
+				.collect(Collectors.toList());
+		});
 	}
 
 	/**
@@ -170,7 +164,7 @@ final class ChartService {
 	 * @param year    The year in which the entries had been play
 	 * @return A list of chart entries for albums
 	 */
-	Collection<EntryArtist> getTopNArtists(int maxRank, int year) {
+	Collection<EntryArtist> getTopNArtists(int maxRank, Year year) {
 
 		var statement = """
 			SELECT * FROM (
@@ -189,7 +183,7 @@ final class ChartService {
 
 		return this.db.withHandle(handle -> handle.createQuery(statement)
 			.bind("maxRank", maxRank)
-			.bind("year", year)
+			.bind("year", year.getValue())
 			.map((rs, ctx) -> new EntryArtist(rs.getInt("rank"), rs.getString("artist")))
 			.collect(Collectors.toList()));
 	}

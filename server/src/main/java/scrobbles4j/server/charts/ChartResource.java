@@ -23,6 +23,7 @@ import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import scrobbles4j.model.Artist;
 
+import java.time.Year;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -65,19 +66,20 @@ public class ChartResource {
 	public TemplateInstance index() {
 
 		return index
-			.data("topTracks", this.chartService.getTopNTracks(10))
+			.data("topTracks", this.chartService.getTopNTracks(10, Optional.empty(), Optional.empty()))
+			.data("topAlbums", this.chartService.getTopNAlbums(10, Optional.empty()))
 			.data("favoriteArtists", this.chartService.getFavoriteArtistsByYears(5, 10));
 	}
 
 	@GET
 	@Path("/{year: (\\d+)}")
 	@Produces(MediaType.TEXT_HTML)
-	public TemplateInstance year(@PathParam("year") int year) {
+	public TemplateInstance year(@PathParam("year") Year year) {
 
 		return overview
 			.data("year", year)
 			.data("topTracks", this.chartService.getTopNTracks(5, Optional.of(year), Optional.empty()))
-			.data("topAlbums", this.chartService.getTopNAlbums(10, year))
+			.data("topAlbums", this.chartService.getTopNAlbums(10, Optional.of(year)))
 			.data("topArtists", this.chartService.getTopNArtists(10, year));
 	}
 

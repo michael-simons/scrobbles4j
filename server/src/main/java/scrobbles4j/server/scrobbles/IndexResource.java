@@ -54,7 +54,7 @@ public class IndexResource {
 	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance index(@Context UriInfo uriInfo) {
 
-		var cutOffDate = ZonedDateTime.now(zoneId).minusMonths(1).toInstant();
+		var cutOffDate = ZonedDateTime.now(zoneId).minusMonths(21).toInstant();
 		return index
 			.data("zone", zoneId)
 			.data("locale", Locale.UK)
