@@ -15,6 +15,13 @@
         </nav>
 
         <main>
+            {#if !scrobbleStats.empty}
+            <p>
+                Scrobbled <strong>{scrobbleStats.numScrobbles}</strong> tracks in {year} for a total duration of
+                {scrobbleStats.formattedTotalDuration}.
+            </p>
+            {/if}
+
             <h2>Top 5 Tracks in {year}</h2>
             <table class="table">
                 <thead>

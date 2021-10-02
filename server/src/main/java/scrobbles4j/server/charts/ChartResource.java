@@ -42,30 +42,30 @@ public class ChartResource {
 
 	private final ChartService chartService;
 
-	private final Template index;
+	private final Template indexTemplate;
 
-	private final Template overview;
+	private final Template yearTemplate;
 
-	private final Template artist;
+	private final Template artistTemplate;
 
 	@Inject
 	public ChartResource(
 		ChartService chartService,
-		@Location("charts/index") Template index,
-		@Location("charts/overview") Template overview,
-		@Location("charts/artist") Template artist
+		@Location("charts/index") Template indexTemplate,
+		@Location("charts/year") Template yearTemplate,
+		@Location("charts/artist") Template artistTemplate
 	) {
 		this.chartService = chartService;
-		this.index = index;
-		this.overview = overview;
-		this.artist = artist;
+		this.indexTemplate = indexTemplate;
+		this.yearTemplate = yearTemplate;
+		this.artistTemplate = artistTemplate;
 	}
 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance index() {
 
-		return index
+		return indexTemplate
 			.data("topTracks", this.chartService.getTopNTracks(10, Optional.empty(), Optional.empty()))
 			.data("topAlbums", this.chartService.getTopNAlbums(10, Optional.empty()))
 			.data("favoriteArtists", this.chartService.getFavoriteArtistsByYears(5, 10));
@@ -76,8 +76,9 @@ public class ChartResource {
 	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance year(@PathParam("year") Year year) {
 
-		return overview
+		return this.yearTemplate
 			.data("year", year)
+			.data("scrobbleStats", this.chartService.getStats(year))
 			.data("topTracks", this.chartService.getTopNTracks(5, Optional.of(year), Optional.empty()))
 			.data("topAlbums", this.chartService.getTopNAlbums(10, Optional.of(year)))
 			.data("topArtists", this.chartService.getTopNArtists(10, year));
@@ -96,7 +97,7 @@ public class ChartResource {
 			throw new WebApplicationException(Response.status(NOT_FOUND).entity("No such artist.").build());
 		}
 
-		return this.artist
+		return this.artistTemplate
 			.data("artist", topTracks.stream().findFirst().map(t -> new Artist(t.artist())).get())
 			.data("topTracks", topTracks);
 	}

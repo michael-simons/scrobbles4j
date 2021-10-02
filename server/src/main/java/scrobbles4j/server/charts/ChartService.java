@@ -18,6 +18,7 @@ package scrobbles4j.server.charts;
 import scrobbles4j.model.Artist;
 
 import java.sql.Types;
+import java.time.Duration;
 import java.time.Year;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -32,21 +33,41 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.statement.Query;
 
 /**
  * This service is responsible for retrieving chart data via SQL from a datasource.
  *
  * @author Michael J. Simons
  */
-@Singleton
-final class ChartService {
+@Singleton final class ChartService {
 
 	private final Jdbi db;
 
-	@Inject
-	ChartService(Jdbi db) {
+	@Inject ChartService(Jdbi db) {
 		this.db = db;
+	}
+
+	/**
+	 * Return stats for the given year.
+	 *
+	 * @param year The year in question
+	 * @return stats for the year
+	 */
+	YearStats getStats(Year year) {
+
+		var statement = """
+			SELECT count(*) num_scrobbles, sum(duration) as total_duration
+			FROM tracks t JOIN plays p ON t.id = p.track_id
+			WHERE year(p.played_on) = :year
+			""";
+
+		return this.db.withHandle(handle -> handle.createQuery(statement)
+			.bind("year", year.getValue())
+			.map((rs, ctx) -> new YearStats(
+				year,
+				rs.getInt("num_scrobbles"),
+				Duration.ofSeconds(rs.getLong("total_duration"))
+			)).one());
 	}
 
 	Map<Integer, List<EntryArtist>> getFavoriteArtistsByYears(int maxRank, int numYears) {
@@ -116,8 +137,10 @@ final class ChartService {
 
 		return this.db.withHandle(handle -> {
 			var query = handle.createQuery(statement);
-			year.map(Year::getValue).ifPresentOrElse(value -> query.bind("year", value), () -> query.bindNull("year", Types.INTEGER));
-			artist.map(Artist::name).ifPresentOrElse(value -> query.bind("artist", value), () -> query.bindNull("artist", Types.CHAR));
+			year.map(Year::getValue)
+				.ifPresentOrElse(value -> query.bind("year", value), () -> query.bindNull("year", Types.INTEGER));
+			artist.map(Artist::name)
+				.ifPresentOrElse(value -> query.bind("artist", value), () -> query.bindNull("artist", Types.CHAR));
 			return query
 				.bind("maxRank", maxRank)
 				.map((rs, ctx) -> new EntryTrack(rs.getInt("rank"), rs.getInt("cnt"), rs.getString("artist"),
@@ -151,7 +174,8 @@ final class ChartService {
 
 		return this.db.withHandle(handle -> {
 			var query = handle.createQuery(statement);
-			year.map(Year::getValue).ifPresentOrElse(value -> query.bind("year", value), () -> query.bindNull("year", Types.INTEGER));
+			year.map(Year::getValue)
+				.ifPresentOrElse(value -> query.bind("year", value), () -> query.bindNull("year", Types.INTEGER));
 			return query
 				.bind("maxRank", maxRank)
 				.map((rs, ctx) -> new EntryAlbum(rs.getInt("rank"), rs.getString("artist"), rs.getString("album")))
