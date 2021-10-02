@@ -19,6 +19,8 @@ package scrobbles4j.model;
  * Representation of a track number (usually a pair of the actual track number and the total number of tracks on an album.
  *
  * @author Michael J. Simons
+ * @param value the actual track number
+ * @param total optional total number of tracks on the album the track belongs to
  */
 public record TrackNumber(int value, Integer total) {
 

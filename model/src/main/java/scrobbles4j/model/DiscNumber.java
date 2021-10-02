@@ -19,6 +19,8 @@ package scrobbles4j.model;
  * Representation of a disc number (usually a pair of the actual disc number and the total number of discs in a set.
  *
  * @author Michael J. Simons
+ * @param value the disc number
+ * @param total the total number of discs if the album is part of a set
  */
 public record DiscNumber(int value, Integer total) {
 

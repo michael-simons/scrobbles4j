@@ -29,6 +29,9 @@ import javax.ws.rs.ext.Provider;
  */
 public final class YearParamConverter implements ParamConverter<Year> {
 
+	/**
+	 * Provider for the {@link YearParamConverter}. Always returns the same instance.
+	 */
 	@Provider
 	public static class YearParamConverterProvider implements ParamConverterProvider {
 

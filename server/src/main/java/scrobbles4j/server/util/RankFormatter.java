@@ -26,6 +26,9 @@ import javax.inject.Singleton;
  */
 public final class RankFormatter {
 
+	/**
+	 * A supplier that returns a new formatter on each call.
+	 */
 	@Named("rankFormatter")
 	@Singleton
 	public static class RankFormatterSupplier implements Supplier<RankFormatter> {

@@ -15,9 +15,6 @@
  */
 package scrobbles4j.server.charts;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
-
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
@@ -37,6 +34,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+/**
+ * Returning charts.
+ *
+ * @author Michael J. Simons
+ */
 @Path("/charts")
 public class ChartResource {
 
@@ -90,11 +92,11 @@ public class ChartResource {
 	public TemplateInstance artist(@QueryParam("q") String q) {
 
 		var artist = Optional.ofNullable(q).map(String::trim).filter(Predicate.not(String::isBlank)).map(Artist::new)
-			.orElseThrow(() -> new WebApplicationException(Response.status(BAD_REQUEST).entity("Query parameter is mandatory.").build()));
+			.orElseThrow(() -> new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Query parameter is mandatory.").build()));
 
 		var topTracks = this.chartService.getTopNTracks(20, Optional.empty(), Optional.of(artist));
 		if (topTracks.isEmpty()) {
-			throw new WebApplicationException(Response.status(NOT_FOUND).entity("No such artist.").build());
+			throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("No such artist.").build());
 		}
 
 		return this.artistTemplate

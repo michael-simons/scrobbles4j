@@ -41,13 +41,13 @@ public class IndexResource {
 
 	private final ScrobbleService scrobbleService;
 
-	private final Template indexTemplate;
+	private final Template index;
 
 	@Inject
 	public IndexResource(ScrobbleService scrobbleService, @Location("scrobbles/index") Template index) {
-		
+
 		this.scrobbleService = scrobbleService;
-		this.indexTemplate = index;
+		this.index = index;
 	}
 
 	@GET
@@ -55,7 +55,7 @@ public class IndexResource {
 	public TemplateInstance index(@Context UriInfo uriInfo) {
 
 		var cutOffDate = ZonedDateTime.now(zoneId).minusMonths(21).toInstant();
-		return indexTemplate
+		return index
 			.data("zone", zoneId)
 			.data("locale", Locale.UK)
 			.data("lastScrobbles", this.scrobbleService.getLatest(20, cutOffDate))

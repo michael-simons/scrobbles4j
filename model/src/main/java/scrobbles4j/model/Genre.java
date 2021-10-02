@@ -19,6 +19,7 @@ package scrobbles4j.model;
  * Representation of a genre.
  *
  * @author Michael J. Simons
+ * @param name Name of the genre
  */
 public record Genre(String name) {
 }

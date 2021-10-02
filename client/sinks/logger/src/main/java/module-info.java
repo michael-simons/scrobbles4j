@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import scrobbles4j.client.sinks.logger.Logger;
+import scrobbles4j.client.sinks.logger.LoggingSink;
 
 /**
  * @author Michael J. Simons
  */
 module scrobbles4j.client.sinks.logger {
 
-	provides scrobbles4j.client.sinks.api.Sink with Logger;
+	provides scrobbles4j.client.sinks.api.Sink with LoggingSink;
 
 	requires scrobbles4j.client.sinks.api;
+	requires java.logging;
 }

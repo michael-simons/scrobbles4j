@@ -23,6 +23,8 @@ import java.time.Instant;
  * A played track.
  *
  * @author Michael J. Simons
+ * @param track    the source track
+ * @param playedOn the moment the track was play on
  */
 public record PlayedTrack(Track track, Instant playedOn) {
 }

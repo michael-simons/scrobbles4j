@@ -17,6 +17,9 @@ package scrobbles4j.server.charts;
 
 /**
  * @author Michael J. Simons
+ * @param rank   rank of that entriy
+ * @param name   the ranked artist
+ * @param change optional change compared to the previous period
  */
 public record EntryArtist(
 	int rank,

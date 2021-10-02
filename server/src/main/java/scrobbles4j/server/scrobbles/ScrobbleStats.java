@@ -19,10 +19,9 @@ import java.time.Instant;
 
 /**
  * @author Michael J. Simons
+ * @param first        moment in time of the first scrobble
+ * @param latest       moment in time of the latest scrobble
+ * @param numScrobbles how many tracks have been scrobbled
  */
-public record ScrobbleStats(
-	Instant first,
-	Instant latest,
-	int numScrobbles
-) {
+public record ScrobbleStats(Instant first, Instant latest, int numScrobbles) {
 }

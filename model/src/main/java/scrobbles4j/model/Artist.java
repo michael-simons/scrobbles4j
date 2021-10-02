@@ -19,6 +19,7 @@ package scrobbles4j.model;
  * Representation of an artist.
  *
  * @author Michael J. Simons
+ * @param name Name of the artist
  */
 public record Artist(String name) {
 }

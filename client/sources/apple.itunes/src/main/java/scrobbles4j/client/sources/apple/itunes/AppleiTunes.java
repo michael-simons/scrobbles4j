@@ -15,15 +15,20 @@
  */
 package scrobbles4j.client.sources.apple.itunes;
 
+import scrobbles4j.client.sources.api.PlayingTrack;
 import scrobbles4j.client.sources.api.Source;
 import scrobbles4j.client.sources.api.State;
-import scrobbles4j.client.sources.api.PlayingTrack;
 
 import java.util.Optional;
 
 import com.tagtraum.japlscript.execution.JaplScriptException;
 import com.tagtraum.macos.itunes.Application;
 
+/**
+ * A source that watches Apple iTunes.
+ *
+ * @author Michael J. Simons
+ */
 public final class AppleiTunes implements Source {
 
 	private final Application application = Application.getInstance();

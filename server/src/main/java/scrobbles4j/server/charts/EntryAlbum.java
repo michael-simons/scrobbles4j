@@ -17,10 +17,9 @@ package scrobbles4j.server.charts;
 
 /**
  * @author Michael J. Simons
+ * @param rank   rank of that entriy
+ * @param artist the artist of the album
+ * @param name   the ranked album
  */
-public record EntryAlbum(
-	int rank,
-	String artist,
-	String name
-) {
+public record EntryAlbum(int rank, String artist, String name) {
 }

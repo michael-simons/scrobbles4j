@@ -19,6 +19,17 @@ package scrobbles4j.model;
  * A track.
  *
  * @author Michael J. Simons
+ * @param artist      Artist of this track
+ * @param genre       Optional genre
+ * @param album       Album this track appeared on
+ * @param name        Name of this track
+ * @param year        Optional year the track was published
+ * @param duration    Optional duration of this track
+ * @param rating      Optional rating
+ * @param comment     Optional comment
+ * @param trackNumber Track number
+ * @param discNumber  Disc number
+ * @param compilation Flag if the album of this track is a compilation
  */
 public record Track(
 	Artist artist,
@@ -29,7 +40,7 @@ public record Track(
 	Integer duration,
 	Integer rating,
 	String comment,
-	TrackNumber tracknumber,
+	TrackNumber trackNumber,
 	DiscNumber discNumber,
 	boolean compilation
 ) {

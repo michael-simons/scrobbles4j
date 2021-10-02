@@ -21,16 +21,8 @@ import scrobbles4j.model.Track;
  * Represents a playing track.
  *
  * @author Michael J. Simons
+ * @param track    The track that is actual playing
+ * @param position The current position.
  */
-public record PlayingTrack(
-
-	/**
-	 * The track that is actual playing.
-	 */
-	Track track,
-	/**
-	 * The current position.
-	 */
-	double position
-) {
+public record PlayingTrack(Track track, double position) {
 }

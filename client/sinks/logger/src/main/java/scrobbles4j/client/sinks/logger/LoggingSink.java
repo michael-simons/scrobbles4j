@@ -18,15 +18,19 @@ package scrobbles4j.client.sinks.logger;
 import scrobbles4j.client.sinks.api.PlayingTrackEvent;
 import scrobbles4j.client.sinks.api.Sink;
 
+import java.util.logging.Logger;
+
 /**
  * @author Michael J. Simons
  */
-public final class Logger implements Sink {
+public final class LoggingSink implements Sink {
+
+	Logger targetLog = Logger.getLogger(LoggingSink.class.getName());
 
 	@Override
 	public void onTrackPlaying(PlayingTrackEvent event) {
 
-		System.out.println("Playing track " + event.track() + " at position " + event.position() + (event.seenBefore() ?
+		targetLog.info("Playing track " + event.track() + " at position " + event.position() + (event.seenBefore() ?
 			"" :
 			" (changed since last event)"));
 	}

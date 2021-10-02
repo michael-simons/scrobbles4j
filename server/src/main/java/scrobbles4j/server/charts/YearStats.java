@@ -20,21 +20,11 @@ import java.time.Year;
 
 /**
  * @author Michael J. Simons
+ * @param year          The year in question
+ * @param numScrobbles  Number of tracks played in the given year
+ * @param totalDuration Total time
  */
-public record YearStats(
-	/**
-	 * The year in question.
-	 */
-	Year year,
-	/**
-	 * Number of tracks played in the given year.
-	 */
-	int numScrobbles,
-	/**
-	 * Total time
-	 */
-	Duration totalDuration
-) {
+public record YearStats(Year year, int numScrobbles, Duration totalDuration) {
 
 	public String formattedTotalDuration() {
 		if (totalDuration.isZero()) {

@@ -17,6 +17,12 @@ package scrobbles4j.client.sinks.api;
 
 import java.util.Comparator;
 
+/**
+ * A comparator for {@link Sink sinks}, comparing them by their {@link Sink#getOrder()}, in which higher values mean
+ * precedence.
+ *
+ * @author Michael J. Simons
+ */
 public enum SinkComparator implements Comparator<Sink> {
 
 	INSTANCE;
