@@ -46,6 +46,31 @@ final class ScrobbleService {
 		this.db = db;
 	}
 
+	/**
+	 * {@return some statistics about the database}
+	 */
+	ScrobbleStats getScrobbleStats() {
+
+		var statement = """
+			SELECT min(played_on) AS first,
+			       max(played_on) AS latest,
+			       count(*) AS num_scrobbles
+			FROM plays;
+			""";
+
+		return this.db.withHandle(handle -> handle.createQuery(statement).map((rs, ctx) -> new ScrobbleStats(
+			rs.getTimestamp("first").toInstant(),
+			rs.getTimestamp("latest").toInstant(),
+			rs.getInt("num_scrobbles")
+		)).one());
+	}
+
+	/**
+	 * The latest track before a given cut off date
+	 * @param maxResults The number of tracks to be received
+	 * @param cutOffDate The date beyond which no tracks should be returned
+	 * @return A collection of played tracks
+	 */
 	Collection<PlayedTrack> getLatest(int maxResults, Instant cutOffDate) {
 
 		var statement = """

@@ -58,6 +58,7 @@ public class IndexResource {
 		return index
 			.data("zone", zoneId)
 			.data("locale", Locale.UK)
-			.data("lastScrobbles", this.scrobbleService.getLatest(20, cutOffDate));
+			.data("lastScrobbles", this.scrobbleService.getLatest(20, cutOffDate))
+			.data("scrobbleStats", this.scrobbleService.getScrobbleStats());
 	}
 }

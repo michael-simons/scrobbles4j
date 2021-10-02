@@ -32,7 +32,13 @@
             </ol>
             {/if}
 
-            <p>Have a look at the <a href="/charts">charts</a>, too.
+            <p>
+                First track scrobbled at <strong>{scrobbleStats.first.format('dd/MM/yyyy, HH:mm', locale, zone)}</strong>,
+                latest at <strong>{scrobbleStats.latest.format('dd/MM/yyyy, HH:mm', locale, zone)}</strong>.
+                In total, <strong>{scrobbleStats.numScrobbles}</strong> tracks have been scrobbled.
+                <br />
+                Have a look at the <a href="/charts">charts</a>, too.
+            </p>
         </main>
         <footer>
             <p>
