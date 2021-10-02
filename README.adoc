@@ -73,4 +73,11 @@ To point it to your own instance run:
   -Dquarkus.datasource.password=secret
 ----
 
-One live instance is here: http://charts.michael-simons.eu
+One live instance is here: http://charts.michael-simons.eu.
+
+NOTE: As the scrobbler backend is not yet implemented, the live data behind the instance
+      above comes straight from my old scrobbler at https://dailyfratze.de.
+      As a matter of fact, Scrobbles4j owns a separate scheme in the database, with
+      read only access and a couple of views onto the original source. 
+      CQRS on the database level. Thanks https://twitter.com/jordisola_/status/1444225890800525316[ᴊᴏʀᴅɪ]
+      for a fitting description.
