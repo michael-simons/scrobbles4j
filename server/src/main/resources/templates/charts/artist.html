@@ -15,7 +15,7 @@
         </nav>
 
         <main>
-            <h2>Top 20 Tracks by {artist.name}<sup>1</sup></h2>
+            <h2>Top 20 Tracks by {artist.name}<sup>1, 2</sup></h2>
             <table class="table">
                 <thead>
                     <tr>
@@ -36,8 +36,11 @@
                     {/let}
                 </tbody>
             </table>
-            <p><sup>1</sup>Tracks are aggregated by artist and track name which means that potentially different versions of a track on different albums are counted together.</p>
 
+            <p>
+                <sup>1</sup>Compilations are excluded.<br />
+                <sup>2</sup>Tracks are aggregated by artist and track name which means that potentially different versions of a track on different albums are counted together.
+            </p>
         </main>
         <footer>
             <p>

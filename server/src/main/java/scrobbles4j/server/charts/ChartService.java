@@ -39,11 +39,13 @@ import org.jdbi.v3.core.Jdbi;
  *
  * @author Michael J. Simons
  */
-@Singleton final class ChartService {
+@Singleton
+final class ChartService {
 
 	private final Jdbi db;
 
-	@Inject ChartService(Jdbi db) {
+	@Inject
+	ChartService(Jdbi db) {
 		this.db = db;
 	}
 
@@ -129,6 +131,7 @@ import org.jdbi.v3.core.Jdbi;
 			  JOIN artists a ON a.id = t.artist_id
 			  WHERE (:year IS NULL OR year(p.played_on) = :year)
 			    AND (:artist IS NULL OR lower(a.artist) = lower(:artist))
+			    AND t.compilation = 'f'
 			  GROUP BY a.artist, t.name
 			) src
 			WHERE rank <= :maxRank
