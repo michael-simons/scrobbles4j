@@ -20,7 +20,10 @@
 module scrobbles4j.client.app {
 	requires scrobbles4j.client.sources.api;
 	requires scrobbles4j.client.sinks.api;
+	requires info.picocli;
 
 	uses scrobbles4j.client.sources.api.Source;
 	uses scrobbles4j.client.sinks.api.Sink;
+
+	opens scrobbles4j.client.app to info.picocli;
 }
