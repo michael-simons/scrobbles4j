@@ -11,6 +11,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>api</module>
+		<module>dailyfratze</module>
 		<module>logger</module>
 	</modules>
 </project>

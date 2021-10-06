@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scrobbles4j.client.sources.api;
-
-import scrobbles4j.model.Track;
+import scrobbles4j.client.sinks.dailyfratze.DailyFratze;
 
 /**
- * Represents a playing track.
- *
  * @author Michael J. Simons
- * @param track            The track that is actual playing
- * @param currentPlayCount The play count at the moment this track is playing
- * @param position         The current position.
  */
-public record PlayingTrack(Track track, int currentPlayCount, double position) {
+module scrobbles4j.client.sinks.dailyfratze {
+
+	provides scrobbles4j.client.sinks.api.Sink with DailyFratze;
+
+	requires scrobbles4j.client.sinks.api;
+	requires java.logging;
+	requires java.net.http;
 }

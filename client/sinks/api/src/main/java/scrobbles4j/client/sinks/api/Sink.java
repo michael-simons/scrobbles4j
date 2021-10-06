@@ -15,6 +15,8 @@
  */
 package scrobbles4j.client.sinks.api;
 
+import java.util.Map;
+
 /**
  * A sink consuming playing tracks.
  *
@@ -22,12 +24,20 @@ package scrobbles4j.client.sinks.api;
  */
 public interface Sink {
 
-	void onTrackPlaying(PlayingTrackEvent event);
-
 	/**
 	 * {@return the order in which this sink should be called} A higher value means higher priority.
 	 */
 	default int getOrder() {
 		return 0;
 	}
+
+	/**
+	 * Configures this sink. Only called once.
+	 *
+	 * @param config The config map for this sink. Prefixes will be removed.
+	 */
+	default void init(Map<String, String> config) {
+	}
+
+	void onTrackPlaying(PlayingTrackEvent event);
 }

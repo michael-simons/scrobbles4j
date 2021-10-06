@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  */
 public final class LoggingSink implements Sink {
 
-	Logger targetLog = Logger.getLogger(LoggingSink.class.getName());
+	private final Logger targetLog = Logger.getLogger(LoggingSink.class.getName());
 
 	@Override
 	public void onTrackPlaying(PlayingTrackEvent event) {

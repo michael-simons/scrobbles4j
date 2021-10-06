@@ -58,6 +58,6 @@ public final class AppleMusic implements Source {
 		}
 
 		var track = Track.of(trackHandle.getProperties());
-		return Optional.of(new PlayingTrack(track, application.getPlayerPosition()));
+		return Optional.of(new PlayingTrack(track, trackHandle.getPlayedCount(), application.getPlayerPosition()));
 	}
 }
