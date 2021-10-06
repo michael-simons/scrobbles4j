@@ -15,19 +15,14 @@
  */
 package scrobbles4j.client.sources.apple.music;
 
-import scrobbles4j.client.sources.api.PlayingTrack;
-import scrobbles4j.client.sources.api.Source;
-import scrobbles4j.client.sources.api.State;
-import scrobbles4j.model.Artist;
-import scrobbles4j.model.DiscNumber;
-import scrobbles4j.model.Genre;
-import scrobbles4j.model.Track;
-import scrobbles4j.model.TrackNumber;
-
 import java.util.Optional;
 
 import com.tagtraum.japlscript.execution.JaplScriptException;
 import com.tagtraum.macos.music.Application;
+import scrobbles4j.client.sources.api.PlayingTrack;
+import scrobbles4j.client.sources.api.Source;
+import scrobbles4j.client.sources.api.State;
+import scrobbles4j.model.Track;
 
 /**
  * @author Michael J. Simons
@@ -62,23 +57,7 @@ public final class AppleMusic implements Source {
 			return Optional.empty();
 		}
 
-		var track = newTrackFromHandle(trackHandle);
+		var track = Track.of(trackHandle.getProperties());
 		return Optional.of(new PlayingTrack(track, application.getPlayerPosition()));
-	}
-
-	static Track newTrackFromHandle(com.tagtraum.macos.music.Track trackHandle) {
-		return new Track(
-			new Artist(trackHandle.getArtist()),
-			new Genre(trackHandle.getGenre()),
-			trackHandle.getAlbum(),
-			trackHandle.getName(),
-			trackHandle.getYear(),
-			Math.toIntExact(Math.round(trackHandle.getDuration())),
-			trackHandle.getRating(),
-			trackHandle.getComment(),
-			new TrackNumber(trackHandle.getTrackNumber(), trackHandle.getTrackCount()),
-			new DiscNumber(trackHandle.getDiscNumber(), trackHandle.getDiscCount()),
-			trackHandle.isCompilation()
-		);
 	}
 }

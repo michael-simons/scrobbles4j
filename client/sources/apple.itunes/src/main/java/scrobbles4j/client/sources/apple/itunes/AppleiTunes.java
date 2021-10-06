@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import com.tagtraum.japlscript.execution.JaplScriptException;
 import com.tagtraum.macos.itunes.Application;
+import scrobbles4j.model.Track;
 
 /**
  * A source that watches Apple iTunes.
@@ -54,6 +55,13 @@ public final class AppleiTunes implements Source {
 
 	@Override
 	public Optional<PlayingTrack> getCurrentTrack() {
-		return Optional.empty();
+
+		var trackHandle = application.getCurrentTrack();
+		if (trackHandle == null) {
+			return Optional.empty();
+		}
+
+		var track = Track.of(trackHandle.getProperties());
+		return Optional.of(new PlayingTrack(track, application.getPlayerPosition()));
 	}
 }

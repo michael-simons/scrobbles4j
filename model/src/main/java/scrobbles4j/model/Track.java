@@ -15,6 +15,8 @@
  */
 package scrobbles4j.model;
 
+import java.util.Map;
+
 /**
  * A track.
  *
@@ -44,4 +46,32 @@ public record Track(
 	DiscNumber discNumber,
 	boolean compilation
 ) {
+
+	/**
+	 * Create a new track from a set of properties
+	 * @param properties The properties (modelled after Apples properties)
+	 * @return A new track
+	 */
+	public static Track of(Map<String, Object> properties) {
+
+		var trackNumber = properties.containsKey("trackNumber") ?
+			new TrackNumber((int) properties.get("trackNumber"), (Integer) properties.get("trackCount")) : null;
+
+		var discNumber = properties.containsKey("discNumber") ?
+			new DiscNumber((int) properties.get("discNumber"), (Integer) properties.get("discCount")) : null;
+
+		return new Track(
+			new Artist((String) properties.get("artist")),
+			new Genre((String) properties.get("genre")),
+			(String) properties.get("album"),
+			(String) properties.get("name"),
+			properties.containsKey("year") ? (Integer) properties.get("year") : null,
+			properties.containsKey("duration") ? Math.toIntExact(Math.round((Double) properties.get("duration"))) : null,
+			properties.containsKey("rating") ? (Integer) properties.get("rating") : null,
+			(String) properties.get("comment"),
+			trackNumber,
+			discNumber,
+			(boolean) properties.getOrDefault("compilation", false)
+		);
+	}
 }
