@@ -23,6 +23,7 @@ import scrobbles4j.model.TrackNumber;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.Year;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -66,7 +67,20 @@ final class ScrobbleService {
 	}
 
 	/**
+	 * {@return years for which chart entries are available}
+	 */
+	Collection<Year> getAvailableYears() {
+
+		return this.db.withHandle(handle -> handle.createQuery("SELECT distinct(year(played_on)) AS year FROM plays")
+			.map((rs, ctx) -> Year.of(rs.getInt("year")))
+			.stream()
+			.sorted(Year::compareTo) // Don't want to bother the db
+			.collect(Collectors.toList()));
+	}
+
+	/**
 	 * The latest track before a given cut off date
+	 *
 	 * @param maxResults The number of tracks to be received
 	 * @param cutOffDate The date beyond which no tracks should be returned
 	 * @return A collection of played tracks

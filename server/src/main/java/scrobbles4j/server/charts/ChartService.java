@@ -133,6 +133,7 @@ final class ChartService {
 			    AND (:artist IS NULL OR lower(a.artist) = lower(:artist))
 			    AND t.compilation = 'f'
 			  GROUP BY a.artist, t.name
+			  HAVING count(*) >= 2
 			) src
 			WHERE rank <= :maxRank
 			ORDER BY rank ASC
@@ -150,6 +151,44 @@ final class ChartService {
 					rs.getString("name")))
 				.collect(Collectors.toList());
 		});
+	}
+
+	/**
+	 * @param maxRank The maximum rank to be included
+	 * @param year    The year in which the tracks have been released and played the first time
+	 * @return A list of chart entries for tracks
+	 */
+	Collection<EntryTrack> getTopNNewTracksInYear(int maxRank, Year year) {
+
+		var statement = """
+			WITH new_tracks AS (
+			  SELECT id, year FROM tracks t
+			  WHERE t.year = :year AND EXISTS( SELECT id FROM plays p WHERE p.track_id = t.id AND year(p.played_on) = t.year)
+			)
+			SELECT * FROM (
+			  SELECT dense_rank() OVER (ORDER BY count(*) DESC) AS rank,
+			         count(*) as cnt,
+			         a.artist,
+			         t.name
+			  FROM new_tracks
+			  JOIN plays p ON p.track_id = new_tracks.id
+			  JOIN tracks t ON t.id = p.track_id
+			  JOIN artists a ON a.id = t.artist_id
+			  WHERE year(p.played_on) = new_tracks.year
+			    AND t.compilation = 'f'
+			  GROUP BY a.artist, t.name
+			  HAVING count(*) >= 2
+			) src
+			WHERE rank <= :maxRank
+			ORDER BY rank ASC
+			""";
+
+		return this.db.withHandle(handle -> handle.createQuery(statement)
+			.bind("year", year.getValue())
+			.bind("maxRank", maxRank)
+			.map((rs, ctx) -> new EntryTrack(rs.getInt("rank"), rs.getInt("cnt"), rs.getString("artist"),
+				rs.getString("name")))
+			.collect(Collectors.toList()));
 	}
 
 	/**

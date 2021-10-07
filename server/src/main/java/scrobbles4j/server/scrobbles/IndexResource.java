@@ -54,11 +54,12 @@ public class IndexResource {
 	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance index(@Context UriInfo uriInfo) {
 
-		var cutOffDate = ZonedDateTime.now(zoneId).minusMonths(21).toInstant();
+		var cutOffDate = ZonedDateTime.now(zoneId).minusMonths(1).toInstant();
 		return index
 			.data("zone", zoneId)
 			.data("locale", Locale.UK)
-			.data("lastScrobbles", this.scrobbleService.getLatest(20, cutOffDate))
-			.data("scrobbleStats", this.scrobbleService.getScrobbleStats());
+			.data("years", scrobbleService.getAvailableYears())
+			.data("lastScrobbles", scrobbleService.getLatest(20, cutOffDate))
+			.data("scrobbleStats", scrobbleService.getScrobbleStats());
 	}
 }

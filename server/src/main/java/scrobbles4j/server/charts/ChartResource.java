@@ -18,7 +18,7 @@ package scrobbles4j.server.charts;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
-import scrobbles4j.model.Artist;
+import scrobbles4j.server.model.Artists;
 
 import java.time.Year;
 import java.util.Optional;
@@ -44,20 +44,26 @@ public class ChartResource {
 
 	private final ChartService chartService;
 
+	private final Artists artists;
+
 	private final Template indexTemplate;
 
 	private final Template yearTemplate;
 
 	private final Template artistTemplate;
 
+
 	@Inject
 	public ChartResource(
 		ChartService chartService,
+		Artists artists,
 		@Location("charts/index") Template indexTemplate,
 		@Location("charts/year") Template yearTemplate,
 		@Location("charts/artist") Template artistTemplate
 	) {
 		this.chartService = chartService;
+		this.artists = artists;
+
 		this.indexTemplate = indexTemplate;
 		this.yearTemplate = yearTemplate;
 		this.artistTemplate = artistTemplate;
@@ -82,6 +88,7 @@ public class ChartResource {
 			.data("year", year)
 			.data("scrobbleStats", this.chartService.getStats(year))
 			.data("topTracks", this.chartService.getTopNTracks(5, Optional.of(year), Optional.empty()))
+			.data("topNewTracks", this.chartService.getTopNNewTracksInYear(5, year))
 			.data("topAlbums", this.chartService.getTopNAlbums(10, Optional.of(year)))
 			.data("topArtists", this.chartService.getTopNArtists(10, year));
 	}
@@ -91,16 +98,16 @@ public class ChartResource {
 	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance artist(@QueryParam("q") String q) {
 
-		var artist = Optional.ofNullable(q).map(String::trim).filter(Predicate.not(String::isBlank)).map(Artist::new)
+		var artistName = Optional.ofNullable(q).map(String::trim).filter(Predicate.not(String::isBlank))
 			.orElseThrow(() -> new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Query parameter is mandatory.").build()));
 
+		var artist = artists.findByName(artistName)
+			.orElseThrow(() -> new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("No such artist.").build()));
+
 		var topTracks = this.chartService.getTopNTracks(20, Optional.empty(), Optional.of(artist));
-		if (topTracks.isEmpty()) {
-			throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("No such artist.").build());
-		}
 
 		return this.artistTemplate
-			.data("artist", topTracks.stream().findFirst().map(t -> new Artist(t.artist())).get())
+			.data("artist", artist)
 			.data("topTracks", topTracks);
 	}
 }
