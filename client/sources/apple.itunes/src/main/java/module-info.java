@@ -24,6 +24,7 @@ module scrobbles4j.client.sources.apple.itunes {
 
 	provides scrobbles4j.client.sources.api.Source with AppleiTunes;
 
+	requires java.logging;
 	requires scrobbles4j.client.sources.api;
 	requires tagtraum.obstunes;
 }

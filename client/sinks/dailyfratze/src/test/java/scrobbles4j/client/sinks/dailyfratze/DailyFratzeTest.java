@@ -59,7 +59,8 @@ class DailyFratzeTest {
 
 		stubFor(post(urlPathEqualTo("/api/scrobbles/new")).willReturn(ok("Scrobbled '" + track.name() + "'")));
 
-		sink.onTrackPlaying(new PlayingTrackEvent(track, 1, 0, false, "foo"));
+		sink.onTrackPlaying(new PlayingTrackEvent(track, 1, track.duration() / 2.0 + 1, false, "foo"));
+		sink.onTrackPlaying(new PlayingTrackEvent(track, 1, track.duration() / 2.0 + 10, false, "foo"));
 
 		verify(1, postRequestedFor(urlPathEqualTo("/api/scrobbles/new"))
 			.withHeader("Content-Type", equalTo("application/x-www-form-urlencoded"))
@@ -69,7 +70,7 @@ class DailyFratzeTest {
 					artist[artist]=Swiss%20+%20Die%20Andern&\
 					genre[genre]=Punk&\
 					track[name]=Punkrock%20Karate%20[mit%20Mortis%20%26%20Mal%20Élevé]&\
-					track[played_count]=1&\
+					track[played_count]=2&\
 					track[rating]=40&\
 					track[duration]=291&\
 					track[compilation]=f&\

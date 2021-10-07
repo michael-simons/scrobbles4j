@@ -15,14 +15,15 @@
  */
 package scrobbles4j.client.sources.apple.itunes;
 
-import scrobbles4j.client.sources.api.PlayingTrack;
-import scrobbles4j.client.sources.api.Source;
-import scrobbles4j.client.sources.api.State;
-
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.tagtraum.japlscript.execution.JaplScriptException;
 import com.tagtraum.macos.itunes.Application;
+import scrobbles4j.client.sources.api.PlayingTrack;
+import scrobbles4j.client.sources.api.Source;
+import scrobbles4j.client.sources.api.State;
 import scrobbles4j.model.Track;
 
 /**
@@ -31,6 +32,8 @@ import scrobbles4j.model.Track;
  * @author Michael J. Simons
  */
 public final class AppleiTunes implements Source {
+
+	private final Logger log = Logger.getLogger(AppleiTunes.class.getName());
 
 	private final Application application = Application.getInstance();
 
@@ -49,6 +52,7 @@ public final class AppleiTunes implements Source {
 				default -> State.UNKNOWN;
 			};
 		} catch (JaplScriptException e) {
+			log.log(Level.WARNING, this.getDisplayName() + " is unavailable.", e);
 			return State.UNAVAILABLE;
 		}
 	}

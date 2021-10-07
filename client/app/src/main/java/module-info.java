@@ -18,9 +18,10 @@
  * @author Michael J. Simons
  */
 module scrobbles4j.client.app {
+	requires info.picocli;
+	requires java.logging;
 	requires scrobbles4j.client.sources.api;
 	requires scrobbles4j.client.sinks.api;
-	requires info.picocli;
 
 	uses scrobbles4j.client.sources.api.Source;
 	uses scrobbles4j.client.sinks.api.Sink;

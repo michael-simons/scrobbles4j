@@ -28,6 +28,11 @@ public final class LoggingSink implements Sink {
 	private final Logger targetLog = Logger.getLogger(LoggingSink.class.getName());
 
 	@Override
+	public boolean isActiveByDefault() {
+		return true;
+	}
+
+	@Override
 	public void onTrackPlaying(PlayingTrackEvent event) {
 
 		targetLog.info("Playing track " + event.track() + " at position " + event.position() + (event.seenBefore() ?

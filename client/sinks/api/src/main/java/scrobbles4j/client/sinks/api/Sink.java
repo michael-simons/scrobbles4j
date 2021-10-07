@@ -32,6 +32,13 @@ public interface Sink {
 	}
 
 	/**
+	 * {@return true if this sink is active by default}
+	 */
+	default boolean isActiveByDefault() {
+		return false;
+	}
+
+	/**
 	 * Configures this sink. Only called once.
 	 *
 	 * @param config The config map for this sink. Prefixes will be removed.

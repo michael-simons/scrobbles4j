@@ -17,11 +17,14 @@ package scrobbles4j.client.app;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import scrobbles4j.client.sinks.api.PlayingTrackEvent;
+import scrobbles4j.client.sinks.api.Sink;
 import scrobbles4j.client.sources.api.PlayingTrack;
 import scrobbles4j.client.sources.api.Source;
 import scrobbles4j.client.sources.api.State;
@@ -44,6 +47,13 @@ class LauncherTest {
 		}
 	}
 
+	static class ASink implements Sink {
+
+		@Override
+		public void onTrackPlaying(PlayingTrackEvent event) {
+		}
+	}
+
 	@Test
 	void includedSourcesShouldWork() {
 
@@ -56,5 +66,14 @@ class LauncherTest {
 		assertThat(Launcher.includeSourcePredicate(Set.of("B Source")).test(aSource)).isFalse();
 		assertThat(Launcher.includeSourcePredicate(Set.of("bSource")).test(aSource)).isFalse();
 		assertThat(Launcher.includeSourcePredicate(Set.of(" bsource")).test(aSource)).isFalse();
+	}
+
+	@Test
+	void extractingPropertiesShouldWork() {
+
+		var config = Map.of("asink.a", "a", "aSink.b", "b", "nothing", "x", "unrelated.y", "y", "ASink.c", "c");
+		var finalConfig = Launcher.extractConfigFor(new ASink(), config);
+		assertThat(finalConfig)
+			.containsAllEntriesOf(Map.of("a", "a", "b", "b", "c", "c"));
 	}
 }

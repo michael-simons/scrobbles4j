@@ -16,6 +16,8 @@
 package scrobbles4j.client.sources.apple.music;
 
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.tagtraum.japlscript.execution.JaplScriptException;
 import com.tagtraum.macos.music.Application;
@@ -29,6 +31,8 @@ import scrobbles4j.model.Track;
  */
 public final class AppleMusic implements Source {
 
+	private final Logger log = Logger.getLogger(AppleMusic.class.getName());
+
 	private final Application application = Application.getInstance();
 
 	@Override
@@ -38,6 +42,7 @@ public final class AppleMusic implements Source {
 
 	@Override
 	public State getCurrentState() {
+
 		try {
 			return switch (application.getPlayerState()) {
 				case STOPPED, PAUSED -> State.STOPPED;
@@ -45,6 +50,7 @@ public final class AppleMusic implements Source {
 				default -> State.UNKNOWN;
 			};
 		} catch (JaplScriptException e) {
+			log.log(Level.WARNING, this.getDisplayName() + " is unavailable.", e);
 			return State.UNAVAILABLE;
 		}
 	}

@@ -24,6 +24,7 @@ module scrobbles4j.client.sources.apple.music {
 
 	provides scrobbles4j.client.sources.api.Source with AppleMusic;
 
+	requires java.logging;
 	requires scrobbles4j.client.sources.api;
 	requires tagtraum.obstmusic;
 }

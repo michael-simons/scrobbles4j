@@ -23,12 +23,17 @@ import scrobbles4j.client.sinks.api.SinkComparator;
 import scrobbles4j.client.sources.api.Source;
 import scrobbles4j.client.sources.api.State;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -39,12 +44,26 @@ import java.util.stream.Collectors;
 @Command(name = "scrobbles4j", mixinStandardHelpOptions = true)
 public final class Launcher implements Runnable {
 
-	@Option(names = "--sources", defaultValue = "", description = """
+	private final Logger log = Logger.getLogger(Launcher.class.getName());
+
+	@Option(names = "--source", description = """
 		The sources to use, valid values are `Apple Music` and `Apple iTunes`. \
 		If no sources are given, all available sources will be activated. \
-		The values are case insensitive and white spaces will be ignored.
+		The values are case insensitive and white spaces will be ignored. \
+		Specify multiple times for multiple sources.
 		""")
-	Set<String> includedSources;
+	Set<String> includedSources = Set.of();
+
+	@Option(names = "--sink", description = """
+		The sinks to use. If no sinks are given, all default sinks will be used. \
+		Specify multiple times for multiple sinks.
+		""")
+	Set<String> includedSinks = Set.of();
+
+	@Option(names = {"-c", "--config"}, description = """
+		Set of config options. Prefix with the name of the source or sink.
+		""")
+	Map<String, String> config = Map.of();
 
 	public static void main(String... args) {
 
@@ -61,8 +80,18 @@ public final class Launcher implements Runnable {
 
 		var sinks = ServiceLoader.load(Sink.class).stream()
 			.map(ServiceLoader.Provider::get)
+			.filter(includeSinkPredicate(includedSinks))
 			.sorted(SinkComparator.INSTANCE)
 			.collect(Collectors.toList());
+
+		sinks.forEach(sink -> sink.init(extractConfigFor(sink, this.config)));
+
+		if (log.isLoggable(Level.INFO) && !(sources.isEmpty() || sinks.isEmpty())) {
+			var joiner = Collectors.joining(", ", "'", "'");
+			var sourceNames = sources.stream().map(Source::getDisplayName).collect(joiner);
+			var sinkNames = sinks.stream().map(s -> s.getClass().getSimpleName()).collect(joiner);
+			log.log(Level.INFO, "Connecting the following sources {0} with these sinks {1}.", new Object[] {sourceNames, sinkNames});
+		}
 
 		var scheduler = Executors.newScheduledThreadPool(sources.size());
 
@@ -80,5 +109,26 @@ public final class Launcher implements Runnable {
 
 		Predicate<Source> includeSource = source -> normalizedSources.isEmpty() || normalizedSources.contains(source.getClass().getSimpleName().toLowerCase(Locale.ENGLISH));
 		return includeSource.and(source -> source.getCurrentState() != State.UNAVAILABLE);
+	}
+
+	static Predicate<Sink> includeSinkPredicate(Set<String> includedSinks) {
+		var normalizedSinks = includedSinks.stream()
+			.map(s -> s.toLowerCase(Locale.ENGLISH).trim().replaceAll("\\s", ""))
+			.collect(Collectors.toSet());
+
+		return sink -> (includedSinks.isEmpty() && sink.isActiveByDefault()) || normalizedSinks.contains(sink.getClass().getSimpleName().toLowerCase(Locale.ENGLISH));
+	}
+
+	static Map<String, String> extractConfigFor(Sink sink, Map<String, String> allConfig) {
+
+		var prefix = Pattern.compile(Pattern.quote(sink.getClass().getSimpleName()) + "\\.", Pattern.CASE_INSENSITIVE);
+		var config = new HashMap<String, String>();
+		allConfig.forEach((k, v) -> {
+			var matcher = prefix.matcher(k);
+			if (matcher.find()) {
+				config.put(matcher.replaceAll(""), v);
+			}
+		});
+		return Map.copyOf(config);
 	}
 }

@@ -23,6 +23,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -32,40 +33,61 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import scrobbles4j.client.sinks.api.AbstractSink;
 import scrobbles4j.client.sinks.api.PlayingTrackEvent;
-import scrobbles4j.client.sinks.api.Sink;
+import scrobbles4j.model.Track;
 
 /**
  * @author Michael J. Simons
  * @since 2021-10-06
  */
-public final class DailyFratze implements Sink {
+public final class DailyFratze extends AbstractSink {
 
 	private final Logger log = Logger.getLogger(DailyFratze.class.getName());
 
-	private final Object lock = new Object();
-
+	/**
+	 * Little surprising the client by which we access the endpoint.
+	 */
 	private final HttpClient httpClient = HttpClient.newBuilder()
 		.version(HttpClient.Version.HTTP_1_1)
 		.followRedirects(HttpClient.Redirect.NORMAL)
 		.build();
 
-	private boolean initialized = false;
+	/**
+	 * Lookup of the latest track by source. Access must be synchronized.
+	 */
+	private final Map<String, Track> latestTrackBySource = new HashMap<>();
 
+	/**
+	 * The user agent.
+	 */
+	private final String ua;
+
+	/**
+	 * The actual endpoint that we post against.
+	 */
 	private URI endpoint;
 
+	/**
+	 * OAuth bearer token.
+	 */
 	private String bearerToken;
 
+	/**
+	 * How do we wanna encode things? Correct or broken as we used to.
+	 */
 	private Function<String, String> encoder;
+
+	public DailyFratze() {
+
+		var descriptor = getClass().getModule().getDescriptor();
+		ua = descriptor.name() + descriptor.version().map(v -> "/" + v).orElse("");
+	}
 
 	@Override
 	public void init(Map<String, String> config) {
 
-		synchronized (lock) {
-			if (initialized) {
-				throw new IllegalStateException("Sink has been already initialized");
-			}
-
+		doInitialize(() -> {
 			bearerToken = Optional.ofNullable(config.get("bearerToken"))
 				.map(String::trim).filter(Predicate.not(String::isBlank)).orElseThrow(() -> new IllegalArgumentException("Bearer token is required."));
 
@@ -75,42 +97,51 @@ public final class DailyFratze implements Sink {
 				.map(URI::create)
 				.orElseThrow(() -> new IllegalArgumentException("Endpoint is required."));
 
-			this.encoder = switch (config.getOrDefault("encoder", "buggyEncoder")) {
+			encoder = switch (config.getOrDefault("encoder", "buggyEncoder")) {
 				case "buggyEncoder" -> buggyEncoder();
 				case "newEncoder" -> newEncoder();
 				default -> throw new IllegalArgumentException("Unsupported encoder '" + config.get("encoder") + "'");
 			};
-
-			initialized = true;
-		}
+		});
 	}
 
 	@Override
 	public void onTrackPlaying(PlayingTrackEvent event) {
 
-		synchronized (lock) {
-			if (!initialized) {
-				throw new IllegalStateException("Sink is not initialized.");
-			}
+		if (!isInitialized()) {
+			throw new IllegalStateException("Sink is not initialized.");
 		}
 
-		// TODO Only to the following after half the track has been played
+		var track = event.track();
 
-		var body = asProperties(event, encoder).entrySet().stream()
-			.map(entry -> String.format("%s=%s", entry.getKey(), encoder.apply(entry.getValue())))
-			.collect(Collectors.joining("&"));
+		if (event.position() < track.duration() / 2) {
+			return;
+		}
 
-		var request = HttpRequest.newBuilder(endpoint)
-			.header("Authorization", String.format("Bearer %s", bearerToken))
-			.header("Content-Type", "application/x-www-form-urlencoded")
-			.POST(HttpRequest.BodyPublishers.ofString(body))
-			.build();
+		synchronized (latestTrackBySource) {
+			var previousTrack = latestTrackBySource.get(event.source());
+			if (previousTrack != null && previousTrack.equals(track)) {
+				return;
+			}
 
-		try {
-			var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-			log.log(Level.INFO, "{0} ({1})", new Object[] {response.body(), response.statusCode()});
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			var body = asProperties(event, encoder).entrySet().stream()
+				.map(entry -> String.format("%s=%s", entry.getKey(), encoder.apply(entry.getValue())))
+				.collect(Collectors.joining("&"));
+
+			var request = HttpRequest.newBuilder(endpoint)
+				.header("User-Agent", ua)
+				.header("Authorization", String.format("Bearer %s", bearerToken))
+				.header("Content-Type", "application/x-www-form-urlencoded")
+				.POST(HttpRequest.BodyPublishers.ofString(body))
+				.build();
+
+			try {
+				var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+				log.log(Level.INFO, "{0} ({1})", new Object[] {response.body(), response.statusCode()});
+				latestTrackBySource.put(event.source(), track);
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -145,17 +176,22 @@ public final class DailyFratze implements Sink {
 		// would be nicer, but as it turns out, the FormBodyPublisher does not allow for a custom
 		// encoder, which we need here to be able to recreate the old scrobblers behaviour
 
-		// TODO Check for nulls
 		var properties = new LinkedHashMap<String, String>();
 		properties.put("artist[artist]", track.artist().name());
 		properties.put("genre[genre]", track.genre().name());
 		properties.put("track[name]", track.name());
-		properties.put("track[played_count]", Integer.toString(event.currentPlayCount()));
-		properties.put("track[rating]", Integer.toString(track.rating()));
-		properties.put("track[duration]", Integer.toString(track.duration()));
+		properties.put("track[played_count]", Integer.toString(event.currentPlayCount() + 1));
+		if (track.rating() != null) {
+			properties.put("track[rating]", Integer.toString(track.rating()));
+		}
+		if (track.duration() != null) {
+			properties.put("track[duration]", Integer.toString(track.duration()));
+		}
 		properties.put("track[compilation]", track.compilation() ? "t" : "f");
 		properties.put("track[album]", track.album());
-		properties.put("track[year]", Integer.toString(track.year()));
+		if (track.year() != null) {
+			properties.put("track[year]", Integer.toString(track.year()));
+		}
 		if (track.discNumber() != null) {
 			var discNumber = track.discNumber();
 			if (discNumber.total() != null) {
