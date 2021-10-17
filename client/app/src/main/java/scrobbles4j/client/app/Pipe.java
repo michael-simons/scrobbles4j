@@ -49,6 +49,7 @@ final class Pipe {
 		source.getCurrentTrack()
 			.map(this::createEvent).stream()
 			.flatMap(event -> sinks.stream().map(sink -> (Runnable) () -> sink.onTrackPlaying(event)))
+			.sequential()
 			.forEach(CompletableFuture::runAsync);
 	}
 
