@@ -23,12 +23,17 @@ import scrobbles4j.client.sources.api.State;
 import scrobbles4j.model.Track;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Michael J. Simons
  */
 final class Pipe {
+
+	private final Logger log = Logger.getLogger(Pipe.class.getName());
 
 	private final Source source;
 	private final List<Sink> sinks;
@@ -42,11 +47,16 @@ final class Pipe {
 
 	void trigger() {
 
-		if (source.getCurrentState() != State.PLAYING) {
-			return;
+		var currentTrack = Optional.<PlayingTrack>empty();
+		try {
+			if (source.getCurrentState() == State.PLAYING) {
+				currentTrack = source.getCurrentTrack();
+			}
+		} catch (Exception e) {
+			log.log(Level.WARNING, e, () -> "Could not retrieve current track from source '%s' in state %s".formatted(source.getDisplayName(), State.PLAYING));
 		}
 
-		source.getCurrentTrack()
+		currentTrack
 			.map(this::createEvent).stream()
 			.flatMap(event -> sinks.stream().map(sink -> (Runnable) () -> sink.onTrackPlaying(event)))
 			.sequential()
