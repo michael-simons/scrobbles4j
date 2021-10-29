@@ -17,7 +17,7 @@ package scrobbles4j.server.charts;
 
 /**
  * @author Michael J. Simons
- * @param rank   rank of that entriy
+ * @param rank   rank of that entry
  * @param cnt    the total amount the track was played
  * @param artist the artist of the track
  * @param name   the ranked track
