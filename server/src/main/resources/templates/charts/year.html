@@ -22,7 +22,7 @@
             </p>
             {/if}
 
-            <h2>Top 5 Tracks in {year}<sup>1, 2</sup></h2>
+            <h2 id="top-tracks">Top 5 Tracks in {year}<sup>1, 2</sup></h2>
             {#if topTracks.empty}
             <p>No data.</p>
             {#else}
@@ -50,7 +50,7 @@
             </table>
             {/if}
 
-            <h2>Top 5 new Tracks in {year}<sup>1, 3</sup></h2>
+            <h2 id="top-new-tracks">Top 5 new Tracks in {year}<sup>1, 3</sup></h2>
             {#if topNewTracks.empty}
             <p>No data.</p>
             {#else}
@@ -78,7 +78,7 @@
             </table>
             {/if}
 
-            <h2>Top 10 Albums in {year}<sup>1</sup></h2>
+            <h2 id="top-albums">Top 10 Albums in {year}<sup>1</sup></h2>
             {#if topAlbums.empty}
             <p>No data.</p>
             {#else}
@@ -104,7 +104,7 @@
             </table>
             {/if}
 
-            <h2>Top 10 Artists in {year}<sup>1</sup></h2>
+            <h2 id="top-artists">Top 10 Artists in {year}<sup>1</sup></h2>
             {#if topArtists.empty}
             <p>No data.</p>
             {#else}
