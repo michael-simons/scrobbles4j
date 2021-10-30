@@ -75,25 +75,23 @@ final class ChartService {
 	Map<Integer, List<EntryArtist>> getFavoriteArtistsByYears(int maxRank, int numYears) {
 
 		var statement = """
-			SELECT * FROM (
-			  WITH rank_per_year AS (
-			    SELECT year(p.played_on) as year,
-			           a.artist,
-			           dense_rank() OVER (partition by year(played_on) ORDER BY count(*) DESC) AS rank
-			    FROM plays p
-			    JOIN tracks t ON t.id = p.track_id
-			    JOIN artists a ON a.id = t.artist_id
-			    WHERE year(p.played_on) between :minYear AND :maxYear
-			      AND t.compilation = 'f'
-			    GROUP BY year(p.played_on), a.artist
-			  )
-			  SELECT year, artist, rank,
-			         ifnull(
-			           lag(rank) OVER (partition by artist ORDER by year ASC) - rank,
-			           'new'
-			  	     )  as `change`
-			  FROM rank_per_year
-			) src
+			WITH rank_per_year AS (
+			   SELECT year(p.played_on) as year,
+			         a.artist,
+			         dense_rank() OVER (partition by year(played_on) ORDER BY count(*) DESC) AS rank
+			  FROM plays p
+			  JOIN tracks t ON t.id = p.track_id
+			  JOIN artists a ON a.id = t.artist_id
+			  WHERE year(p.played_on) between :minYear AND :maxYear
+			    AND t.compilation = 'f'
+			  GROUP BY year(p.played_on), a.artist
+			)
+			SELECT year, artist, rank,
+			       CASE
+			         WHEN lag(year) OVER (partition by artist ORDER by year ASC) != year -1 THEN 'new'
+			         ELSE ifnull(lag(rank) OVER (partition by artist ORDER by year ASC) - rank, 'new')
+			       END as `change`
+			FROM rank_per_year
 			WHERE rank <= :maxRank
 			ORDER BY year DESC, rank ASC
 			""";

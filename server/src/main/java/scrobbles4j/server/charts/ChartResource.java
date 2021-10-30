@@ -73,10 +73,12 @@ public class ChartResource {
 	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance index() {
 
+		var numArtists = 10;
 		return indexTemplate
 			.data("topTracks", this.chartService.getTopNTracks(10, Optional.empty(), Optional.empty()))
 			.data("topAlbums", this.chartService.getTopNAlbums(10, Optional.empty()))
-			.data("favoriteArtists", this.chartService.getFavoriteArtistsByYears(5, 10));
+			.data("numArtists", numArtists)
+			.data("favoriteArtists", this.chartService.getFavoriteArtistsByYears(numArtists, 10));
 	}
 
 	@GET
