@@ -26,8 +26,4 @@ public record EntryArtist(
 	String name,
 	String change
 ) {
-
-	EntryArtist(int rank, String name) {
-		this(rank, name, null);
-	}
 }

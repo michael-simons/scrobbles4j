@@ -82,7 +82,7 @@ final class ChartService {
 			  FROM plays p
 			  JOIN tracks t ON t.id = p.track_id
 			  JOIN artists a ON a.id = t.artist_id
-			  WHERE year(p.played_on) between :minYear AND :maxYear
+			  WHERE year(p.played_on) BETWEEN :minYear AND :maxYear
 			    AND t.compilation = 'f'
 			  GROUP BY year(p.played_on), a.artist
 			)
@@ -93,7 +93,7 @@ final class ChartService {
 			       END as `change`
 			FROM rank_per_year
 			WHERE rank <= :maxRank
-			ORDER BY year DESC, rank ASC
+			ORDER BY year DESC, rank ASC, artist ASC
 			""";
 
 		var currentYear = ZonedDateTime.now().getYear();
@@ -233,24 +233,37 @@ final class ChartService {
 	Collection<EntryArtist> getTopNArtists(int maxRank, Year year) {
 
 		var statement = """
-			SELECT * FROM (
-			  SELECT dense_rank() OVER (ORDER BY count(*) DESC) AS rank,
-			         a.artist
-			  FROM plays p
-			  JOIN tracks t ON t.id = p.track_id
-			  JOIN artists a ON a.id = t.artist_id
-			  WHERE year(p.played_on) = :year
-			    AND t.compilation = 'f'
-			  GROUP BY a.artist
-			) src
-			WHERE rank <= :maxRank
-			ORDER BY rank ASC;
+			WITH
+			  rank_per_year AS (
+			    SELECT year(p.played_on) as year,
+			           a.artist,
+			           dense_rank() OVER (partition by year(played_on) ORDER BY count(*) DESC) AS rank
+			    FROM plays p
+			    JOIN tracks t ON t.id = p.track_id
+			    JOIN artists a ON a.id = t.artist_id
+			    WHERE year(p.played_on) BETWEEN :year - 1 AND :year
+			      AND t.compilation = 'f'
+			    GROUP BY year(p.played_on), a.artist
+			  ),
+			  unfiltered AS (
+			    SELECT year, artist, rank,
+			           CASE
+			             WHEN lag(year) OVER (partition by artist ORDER by year ASC) != year -1 THEN 'new'
+			             ELSE ifnull(lag(rank) OVER (partition by artist ORDER by year ASC) - rank, 'new')
+			           END as `change`
+			    FROM rank_per_year
+			    WHERE rank <= :maxRank
+			  )
+			SELECT *
+			FROM unfiltered
+			WHERE year = :year
+			ORDER BY rank ASC, artist ASC
 			""";
 
 		return this.db.withHandle(handle -> handle.createQuery(statement)
 			.bind("maxRank", maxRank)
 			.bind("year", year.getValue())
-			.map((rs, ctx) -> new EntryArtist(rs.getInt("rank"), rs.getString("artist")))
+			.map((rs, ctx) -> new EntryArtist(rs.getInt("rank"), rs.getString("artist"), rs.getString("change")))
 			.collect(Collectors.toList()));
 	}
 }

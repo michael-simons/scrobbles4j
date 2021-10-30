@@ -113,6 +113,7 @@
                     <tr>
                         <th scope="col">Rank</th>
                         <th scope="col">Name</th>
+                        <th scope="col">Change</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -121,6 +122,7 @@
                     <tr>
                         <th scope="row">{rankFormatter.format(entry.rank)}</th>
                         <td><a href="/charts/artist?q={str:urlEncode(entry.name)}">{entry.name}</a></td>
+                        <td>{entry.change}</td>
                     </tr>
                     {/for}
                     {/let}
