@@ -82,17 +82,20 @@ final class ChartService {
 			  FROM plays p
 			  JOIN tracks t ON t.id = p.track_id
 			  JOIN artists a ON a.id = t.artist_id
-			  WHERE year(p.played_on) BETWEEN :minYear AND :maxYear
+			  WHERE year(p.played_on) BETWEEN :minYear - 1 AND :maxYear
 			    AND t.compilation = 'f'
 			  GROUP BY year(p.played_on), a.artist
+			), unfiltered AS (
+			  SELECT year, artist, rank,
+			         CASE
+			           WHEN lag(year) OVER (partition by artist ORDER by year ASC) != year -1 THEN 'new'
+			           ELSE ifnull(lag(rank) OVER (partition by artist ORDER by year ASC) - rank, 'new')
+			         END as `change`
+			  FROM rank_per_year
+			  WHERE rank <= :maxRank
 			)
-			SELECT year, artist, rank,
-			       CASE
-			         WHEN lag(year) OVER (partition by artist ORDER by year ASC) != year -1 THEN 'new'
-			         ELSE ifnull(lag(rank) OVER (partition by artist ORDER by year ASC) - rank, 'new')
-			       END as `change`
-			FROM rank_per_year
-			WHERE rank <= :maxRank
+			SELECT * FROM unfiltered
+			WHERE year >= :minYear
 			ORDER BY year DESC, rank ASC, artist ASC
 			""";
 
