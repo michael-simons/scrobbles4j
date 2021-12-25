@@ -8,18 +8,9 @@
 	</parent>
 
 	<artifactId>scrobbles4j.server</artifactId>
-	<properties>
-		<!-- There is a missmatch between jdbi and quarkus -->
-		<antlr4-runtime.version>4.9.2</antlr4-runtime.version>
-	</properties>
 
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>org.antlr</groupId>
-				<artifactId>antlr4-runtime</artifactId>
-				<version>${antlr4-runtime.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>${quarkus.platform.group-id}</groupId>
 				<artifactId>${quarkus.platform.artifact-id}</artifactId>
