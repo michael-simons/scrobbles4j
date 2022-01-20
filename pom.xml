@@ -305,7 +305,7 @@
 				<configuration>
 					<detectOfflineLinks>false</detectOfflineLinks>
 					<detectJavaApiLink>true</detectJavaApiLink>
-					<release>${java.version}</release>
+					<release>${maven.compiler.release}</release>
 					<tags>
 						<tag>
 							<name>soundtrack</name>
