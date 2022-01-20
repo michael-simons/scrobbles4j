@@ -6,6 +6,8 @@
 A set of modules around tracking, displaying and analyzing musical habits ("scrobbling") via Java.
 --
 
+image:https://github.com/michael-simons/scrobbles4j/workflows/build/badge.svg[link=https://github.com/michael-simons/scrobbles4j/actions]
+
 == Requirements
 
 === For building the project
