@@ -48,10 +48,10 @@
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
-						<phase>package</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
 							<outputDirectory>${project.build.directory}/modules</outputDirectory>
 
