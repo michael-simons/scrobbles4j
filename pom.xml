@@ -42,7 +42,7 @@
 		<assertj.version>3.21.0</assertj.version>
 		<checkstyle.version>9.0</checkstyle.version>
 		<jdbi3.version>3.22.0</jdbi3.version>
-		<junit-jupiter.version>5.7.2</junit-jupiter.version>
+		<junit-jupiter.version>5.8.2</junit-jupiter.version>
 		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.9.0</maven-compiler-plugin.version>
 		<maven-dependency-plugin.version>3.2.0</maven-dependency-plugin.version>
