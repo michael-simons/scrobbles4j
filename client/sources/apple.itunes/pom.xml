@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>scrobbles4j.client.sources.apple.itunes</artifactId>
 	<properties>
-		<obstunes.version>0.9.4</obstunes.version>
+		<obstunes.version>0.9.5</obstunes.version>
 	</properties>
 
 	<dependencies>
