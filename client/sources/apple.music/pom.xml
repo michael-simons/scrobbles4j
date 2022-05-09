@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>scrobbles4j.client.sources.apple.music</artifactId>
 	<properties>
-		<obstmusic.version>0.9.6</obstmusic.version>
+		<obstmusic.version>0.9.7</obstmusic.version>
 	</properties>
 
 	<dependencies>
