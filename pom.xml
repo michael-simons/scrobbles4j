@@ -39,7 +39,7 @@
 	</modules>
 
 	<properties>
-		<assertj.version>3.22.0</assertj.version>
+		<assertj.version>3.23.1</assertj.version>
 		<checkstyle.version>10.3</checkstyle.version>
 		<jdbi3.version>3.29.0</jdbi3.version>
 		<junit-jupiter.version>5.8.2</junit-jupiter.version>
