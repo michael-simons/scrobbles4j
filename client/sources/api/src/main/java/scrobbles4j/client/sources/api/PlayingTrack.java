@@ -22,8 +22,7 @@ import scrobbles4j.model.Track;
  *
  * @author Michael J. Simons
  * @param track            The track that is actual playing
- * @param currentPlayCount The play count at the moment this track is playing
  * @param position         The current position.
  */
-public record PlayingTrack(Track track, int currentPlayCount, double position) {
+public record PlayingTrack(Track track, double position) {
 }

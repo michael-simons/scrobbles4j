@@ -15,6 +15,9 @@
  */
 package scrobbles4j.client.sinks.api;
 
+import scrobbles4j.model.PlayedTrack;
+
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -47,4 +50,7 @@ public interface Sink {
 	}
 
 	void onTrackPlaying(PlayingTrackEvent event);
+
+	default void consumeAll(Collection<PlayedTrack> playedTracks) {
+	}
 }

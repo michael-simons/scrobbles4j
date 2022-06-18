@@ -1,0 +1,1 @@
+ALTER TABLE tracks ADD COLUMN IF NOT EXISTS played_count INTEGER;

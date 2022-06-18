@@ -22,6 +22,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
 
 import scrobbles4j.client.sinks.api.AbstractSink;
 import scrobbles4j.client.sinks.api.PlayingTrackEvent;
+import scrobbles4j.model.PlayedTrack;
 import scrobbles4j.model.Track;
 
 /**
@@ -114,7 +118,7 @@ public final class DailyFratze extends AbstractSink {
 
 		var track = event.track();
 
-		if (event.position() < track.duration() / 2) {
+		if (event.position() < track.duration() / 2.0) {
 			return;
 		}
 
@@ -124,25 +128,46 @@ public final class DailyFratze extends AbstractSink {
 				return;
 			}
 
-			var body = asProperties(event, encoder).entrySet().stream()
-				.map(entry -> String.format("%s=%s", entry.getKey(), encoder.apply(entry.getValue())))
-				.collect(Collectors.joining("&"));
-
-			var request = HttpRequest.newBuilder(endpoint)
-				.header("User-Agent", ua)
-				.header("Authorization", String.format("Bearer %s", bearerToken))
-				.header("Content-Type", "application/x-www-form-urlencoded")
-				.POST(HttpRequest.BodyPublishers.ofString(body))
-				.build();
-
 			try {
-				var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+				var response = post(asProperties(event.track(), null, encoder));
 				log.log(Level.INFO, "{0} ({1})", new Object[] {response.body(), response.statusCode()});
 				latestTrackBySource.put(event.source(), track);
 			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public void consumeAll(Collection<PlayedTrack> playedTracks) {
+
+		if (!isInitialized()) {
+			throw new IllegalStateException("Sink is not initialized.");
+		}
+
+		for (var playedTrack : playedTracks) {
+			try {
+				var response = post(asProperties(playedTrack.track(), playedTrack.playedOn(), encoder));
+				log.log(Level.INFO, "{0} ({1})", new Object[] {response.body(), response.statusCode()});
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private HttpResponse<String> post(Map<String, String> properties) throws IOException, InterruptedException {
+		var body = properties.entrySet().stream()
+			.map(entry -> String.format("%s=%s", entry.getKey(), encoder.apply(entry.getValue())))
+			.collect(Collectors.joining("&"));
+
+		var request = HttpRequest.newBuilder(endpoint)
+			.header("User-Agent", ua)
+			.header("Authorization", String.format("Bearer %s", bearerToken))
+			.header("Content-Type", "application/x-www-form-urlencoded")
+			.POST(HttpRequest.BodyPublishers.ofString(body))
+			.build();
+
+		return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 	}
 
 	/**
@@ -168,9 +193,7 @@ public final class DailyFratze extends AbstractSink {
 			.orElse("");
 	}
 
-	static Map<String, String> asProperties(PlayingTrackEvent event, Function<String, String> encoder) {
-
-		var track = event.track();
+	static Map<String, String> asProperties(Track track, Instant playedOn, Function<String, String> encoder) {
 
 		// https://mizosoft.github.io/methanol/multipart_and_forms/
 		// would be nicer, but as it turns out, the FormBodyPublisher does not allow for a custom
@@ -180,7 +203,7 @@ public final class DailyFratze extends AbstractSink {
 		properties.put("artist[artist]", track.artist().name());
 		properties.put("genre[genre]", track.genre().name());
 		properties.put("track[name]", track.name());
-		properties.put("track[played_count]", Integer.toString(event.currentPlayCount() + 1));
+		properties.put("track[played_count]", Integer.toString(track.playedCount() + (playedOn == null ? 1 : 0)));
 		if (track.rating() != null) {
 			properties.put("track[rating]", Integer.toString(track.rating()));
 		}
@@ -207,6 +230,17 @@ public final class DailyFratze extends AbstractSink {
 			properties.put("track[track_number]", Integer.toString(trackNumber.value()));
 		}
 		properties.put("track[comment]", encoder.apply(track.comment()));
+
+		if (playedOn != null) {
+			// This behaviour (system default zone) is actually the same as the previous iTunes Script
+			var playedOnInZone = playedOn.atZone(ZoneId.systemDefault());
+			properties.put("date[y]", Integer.toString(playedOnInZone.getYear()));
+			properties.put("date[M]", Integer.toString(playedOnInZone.getMonthValue()));
+			properties.put("date[d]", Integer.toString(playedOnInZone.getDayOfMonth()));
+			properties.put("date[h]", Integer.toString(playedOnInZone.getHour()));
+			properties.put("date[m]", Integer.toString(playedOnInZone.getMinute()));
+			properties.put("date[s]", Integer.toString(playedOnInZone.getSecond()));
+		}
 
 		return Collections.unmodifiableMap(properties);
 	}

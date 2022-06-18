@@ -15,6 +15,10 @@
  */
 package scrobbles4j.client.sources.api;
 
+import scrobbles4j.model.PlayedTrack;
+
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -42,4 +46,11 @@ public interface Source {
 	 * {@return the current playing track} If the latest track cannot be determined the method should return an empty {@link Optional}.
 	 */
 	Optional<PlayingTrack> getCurrentTrack();
+
+	/**
+	 * {@return the current selection of played tracks}
+	 */
+	default Collection<PlayedTrack> getSelectedTracks() {
+		return List.of();
+	}
 }

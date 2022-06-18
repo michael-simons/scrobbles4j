@@ -17,7 +17,9 @@ package scrobbles4j.client.sinks.logger;
 
 import scrobbles4j.client.sinks.api.PlayingTrackEvent;
 import scrobbles4j.client.sinks.api.Sink;
+import scrobbles4j.model.PlayedTrack;
 
+import java.util.Collection;
 import java.util.logging.Logger;
 
 /**
@@ -38,5 +40,12 @@ public final class LoggingSink implements Sink {
 		targetLog.info("Playing track " + event.track() + " at position " + event.position() + (event.seenBefore() ?
 			"" :
 			" (changed since last event)"));
+	}
+
+	@Override
+	public void consumeAll(Collection<PlayedTrack> playedTracks) {
+
+		targetLog.info("Received the following tracks");
+		playedTracks.forEach(playedTrack -> targetLog.info(() -> String.format("%s played on %s", playedTrack.track(), playedTrack.playedOn())));
 	}
 }

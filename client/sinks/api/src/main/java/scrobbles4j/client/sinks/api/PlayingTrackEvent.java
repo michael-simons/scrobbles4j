@@ -22,10 +22,9 @@ import scrobbles4j.model.Track;
  *
  * @author Michael J. Simons
  * @param track            The track that is actual playing
- * @param currentPlayCount The play count at the moment this track is playing
  * @param position         The current position
  * @param seenBefore       True if this the track has been seen before
  * @param source           Name of the source that published the track
  */
-public record PlayingTrackEvent(Track track, int currentPlayCount, double position, boolean seenBefore, String source) {
+public record PlayingTrackEvent(Track track, double position, boolean seenBefore, String source) {
 }

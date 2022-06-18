@@ -15,6 +15,8 @@
  */
 package scrobbles4j.client.sources.apple.music;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,6 +26,7 @@ import com.tagtraum.macos.music.Application;
 import scrobbles4j.client.sources.api.PlayingTrack;
 import scrobbles4j.client.sources.api.Source;
 import scrobbles4j.client.sources.api.State;
+import scrobbles4j.model.PlayedTrack;
 import scrobbles4j.model.Track;
 
 /**
@@ -64,6 +67,18 @@ public final class AppleMusic implements Source {
 		}
 
 		var track = Track.of(trackHandle.getProperties());
-		return Optional.of(new PlayingTrack(track, trackHandle.getPlayedCount(), application.getPlayerPosition()));
+		return Optional.of(new PlayingTrack(track, application.getPlayerPosition()));
+	}
+
+	@Override
+	public Collection<PlayedTrack> getSelectedTracks() {
+
+		return Arrays.stream(application.getSelection().cast(com.tagtraum.macos.music.Track[].class))
+			.filter(trackHandle -> trackHandle.getProperties().containsKey("playedDate"))
+			.map(trackHandle -> {
+				var track = Track.of(trackHandle.getProperties());
+				return new PlayedTrack(track, trackHandle.getPlayedDate().toInstant());
+			})
+			.toList();
 	}
 }

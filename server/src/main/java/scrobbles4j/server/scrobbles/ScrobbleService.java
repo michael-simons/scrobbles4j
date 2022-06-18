@@ -18,6 +18,7 @@ package scrobbles4j.server.scrobbles;
 import scrobbles4j.model.Artist;
 import scrobbles4j.model.DiscNumber;
 import scrobbles4j.model.Genre;
+import scrobbles4j.model.PlayedTrack;
 import scrobbles4j.model.Track;
 import scrobbles4j.model.TrackNumber;
 
@@ -117,6 +118,7 @@ final class ScrobbleService {
 					rs.getObject("year", Integer.class),
 					rs.getObject("rating", Integer.class),
 					rs.getObject("duration", Integer.class),
+					rs.getObject("played_count", Integer.class),
 					rs.getString("comment"),
 					trackNumber, discNumber,
 					"t".equalsIgnoreCase(rs.getString("compilation"))

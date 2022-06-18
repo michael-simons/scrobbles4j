@@ -24,6 +24,7 @@ import scrobbles4j.client.sources.api.Source;
 import scrobbles4j.client.sources.api.State;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -60,7 +61,7 @@ public final class Launcher implements Runnable {
 		""")
 	Set<String> includedSinks = Set.of();
 
-	@Option(names = {"-c", "--config"}, description = """
+	@Option(names = { "-c", "--config" }, description = """
 		Set of config options. Prefix with the name of the source or sink.
 		""")
 	Map<String, String> config = Map.of();
@@ -70,19 +71,29 @@ public final class Launcher implements Runnable {
 		new CommandLine(new Launcher()).execute(args);
 	}
 
+	@Command(name = "publish-selected-tracks", description = "Use this option to publish selected tracks only.")
+	public void publishSelectedTracks() {
+
+		var sources = getSources();
+		var sinks = getSinks();
+
+		sinks.forEach(sink -> sink.init(extractConfigFor(sink, this.config)));
+
+		if (sources.isEmpty()) {
+			log.warning("No sources");
+		} else if (sinks.isEmpty()) {
+			log.warning("No sinks");
+		} else {
+			var allTracks = sources.stream().flatMap(source -> source.getSelectedTracks().stream()).toList();
+			sinks.forEach(sink -> sink.consumeAll(allTracks));
+		}
+	}
+
 	@Override
 	public void run() {
 
-		var sources = ServiceLoader.load(Source.class).stream()
-			.map(ServiceLoader.Provider::get)
-			.filter(includeSourcePredicate(includedSources))
-			.collect(Collectors.toList());
-
-		var sinks = ServiceLoader.load(Sink.class).stream()
-			.map(ServiceLoader.Provider::get)
-			.filter(includeSinkPredicate(includedSinks))
-			.sorted(SinkComparator.INSTANCE)
-			.collect(Collectors.toList());
+		var sources = getSources();
+		var sinks = getSinks();
 
 		sinks.forEach(sink -> sink.init(extractConfigFor(sink, this.config)));
 
@@ -90,7 +101,8 @@ public final class Launcher implements Runnable {
 			var joiner = Collectors.joining(", ", "'", "'");
 			var sourceNames = sources.stream().map(Source::getDisplayName).collect(joiner);
 			var sinkNames = sinks.stream().map(s -> s.getClass().getSimpleName()).collect(joiner);
-			log.log(Level.INFO, "Connecting the following sources {0} with these sinks {1}.", new Object[] {sourceNames, sinkNames});
+			log.log(Level.INFO, "Connecting the following sources {0} with these sinks {1}.",
+				new Object[] { sourceNames, sinkNames });
 		}
 
 		var scheduler = Executors.newScheduledThreadPool(sources.size());
@@ -102,12 +114,30 @@ public final class Launcher implements Runnable {
 		Runtime.getRuntime().addShutdownHook(new Thread(scheduler::shutdown));
 	}
 
+	private List<Source> getSources() {
+
+		return ServiceLoader.load(Source.class).stream()
+			.map(ServiceLoader.Provider::get)
+			.filter(includeSourcePredicate(includedSources))
+			.toList();
+	}
+
+	private List<Sink> getSinks() {
+
+		return ServiceLoader.load(Sink.class).stream()
+			.map(ServiceLoader.Provider::get)
+			.filter(includeSinkPredicate(includedSinks))
+			.sorted(SinkComparator.INSTANCE)
+			.toList();
+	}
+
 	static Predicate<Source> includeSourcePredicate(Set<String> includedSources) {
 		var normalizedSources = includedSources.stream()
 			.map(s -> s.toLowerCase(Locale.ENGLISH).trim().replaceAll("\\s", ""))
 			.collect(Collectors.toSet());
 
-		Predicate<Source> includeSource = source -> normalizedSources.isEmpty() || normalizedSources.contains(source.getClass().getSimpleName().toLowerCase(Locale.ENGLISH));
+		Predicate<Source> includeSource = source -> normalizedSources.isEmpty() || normalizedSources.contains(
+			source.getClass().getSimpleName().toLowerCase(Locale.ENGLISH));
 		return includeSource.and(source -> source.getCurrentState() != State.UNAVAILABLE);
 	}
 
@@ -116,7 +146,8 @@ public final class Launcher implements Runnable {
 			.map(s -> s.toLowerCase(Locale.ENGLISH).trim().replaceAll("\\s", ""))
 			.collect(Collectors.toSet());
 
-		return sink -> (includedSinks.isEmpty() && sink.isActiveByDefault()) || normalizedSinks.contains(sink.getClass().getSimpleName().toLowerCase(Locale.ENGLISH));
+		return sink -> (includedSinks.isEmpty() && sink.isActiveByDefault()) || normalizedSinks.contains(
+			sink.getClass().getSimpleName().toLowerCase(Locale.ENGLISH));
 	}
 
 	static Map<String, String> extractConfigFor(Sink sink, Map<String, String> allConfig) {

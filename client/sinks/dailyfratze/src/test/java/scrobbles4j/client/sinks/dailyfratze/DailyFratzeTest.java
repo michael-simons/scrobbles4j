@@ -55,12 +55,12 @@ class DailyFratzeTest {
 			new Genre("Punk"),
 			"Orphan",
 			"Punkrock Karate [mit Mortis & Mal Élevé]",
-			2021, 291, 40, "ripped & encoded by MJS", new TrackNumber(9, 11), new DiscNumber(1, 2), false);
+			2021, 291, 40, 1, "ripped & encoded by MJS", new TrackNumber(9, 11), new DiscNumber(1, 2), false);
 
 		stubFor(post(urlPathEqualTo("/api/scrobbles/new")).willReturn(ok("Scrobbled '" + track.name() + "'")));
 
-		sink.onTrackPlaying(new PlayingTrackEvent(track, 1, track.duration() / 2.0 + 1, false, "foo"));
-		sink.onTrackPlaying(new PlayingTrackEvent(track, 1, track.duration() / 2.0 + 10, false, "foo"));
+		sink.onTrackPlaying(new PlayingTrackEvent(track, track.duration() / 2.0 + 1, false, "foo"));
+		sink.onTrackPlaying(new PlayingTrackEvent(track, track.duration() / 2.0 + 10, false, "foo"));
 
 		verify(1, postRequestedFor(urlPathEqualTo("/api/scrobbles/new"))
 			.withHeader("Content-Type", equalTo("application/x-www-form-urlencoded"))

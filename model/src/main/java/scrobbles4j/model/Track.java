@@ -28,6 +28,7 @@ import java.util.Map;
  * @param year        Optional year the track was published
  * @param duration    Optional duration of this track
  * @param rating      Optional rating
+ * @param playedCount The number of times this track was played
  * @param comment     Optional comment
  * @param trackNumber Track number
  * @param discNumber  Disc number
@@ -41,6 +42,7 @@ public record Track(
 	Integer year,
 	Integer duration,
 	Integer rating,
+	Integer playedCount,
 	String comment,
 	TrackNumber trackNumber,
 	DiscNumber discNumber,
@@ -68,6 +70,7 @@ public record Track(
 			properties.containsKey("year") ? (Integer) properties.get("year") : null,
 			properties.containsKey("duration") ? Math.toIntExact(Math.round((Double) properties.get("duration"))) : null,
 			properties.containsKey("rating") ? (Integer) properties.get("rating") : null,
+			properties.containsKey("playedCount") ? (Integer) properties.get("playedCount") : null,
 			(String) properties.get("comment"),
 			trackNumber,
 			discNumber,

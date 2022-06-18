@@ -66,7 +66,6 @@ final class Pipe {
 	PlayingTrackEvent createEvent(PlayingTrack playingTrack) {
 		boolean seenBefore = playingTrack.track().equals(lastTrack);
 		lastTrack = playingTrack.track();
-		return new PlayingTrackEvent(playingTrack.track(), playingTrack.currentPlayCount(), playingTrack.position(), seenBefore,
-			source.getDisplayName());
+		return new PlayingTrackEvent(playingTrack.track(), playingTrack.position(), seenBefore, source.getDisplayName());
 	}
 }
