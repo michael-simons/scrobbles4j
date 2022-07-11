@@ -25,7 +25,7 @@
                 <li>
                     <span class="track">"{track.name}"</span> by <span class="artist"><a href="/charts/artist?q={str:urlEncode(track.artist.name)}">{track.artist.name}</a></td></span> from
                     the album <span class="album">"{track.album}"</span>
-                    at {playedOn.format('dd/MM/yyyy, HH:mm', locale, zone)}
+                    at <span class="played-on">{playedOn.format('dd/MM/yyyy, HH:mm', locale, zone)}</span>
                 </li>
                 {/with}
                 {/for}

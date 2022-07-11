@@ -29,12 +29,15 @@ class IndexResourceTest {
 
 	@Test
 	void indexShouldWork() {
-		var firstTrack = RestAssured.when().get()
+		var response = RestAssured.when().get()
 			.then().statusCode(200)
-			.extract()
-			.htmlPath()
-			.getString("html.body.main.ol.li[0].span[0]");
+			.extract().htmlPath();
 
-		assertThat(firstTrack).isEqualTo("\"Only For The Weak\"");
+		var title = response
+			.getString("html.body.main.ol.li[0].span[0]");
+		assertThat(title).isEqualTo("\"Only For The Weak\"");
+		var playedOn = response
+			.getString("html.body.main.ol.li[0].span[3]");
+		assertThat(playedOn).endsWith("04:03");
 	}
 }

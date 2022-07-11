@@ -102,6 +102,7 @@
 					<systemPropertyVariables>
 						<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
 					</systemPropertyVariables>
+					<argLine>-Duser.timezone=Europe/Berlin</argLine>
 				</configuration>
 			</plugin>
 		</plugins>
