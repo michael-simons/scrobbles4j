@@ -8,6 +8,10 @@
 	</parent>
 
 	<artifactId>scrobbles4j.server</artifactId>
+	<properties>
+		<jsr305.version>3.0.2</jsr305.version>
+		<mariadb-java-client.version>2.7.6</mariadb-java-client.version>
+	</properties>
 
 	<dependencyManagement>
 		<dependencies>
@@ -28,7 +32,7 @@
 			<dependency>
 				<groupId>org.mariadb.jdbc</groupId>
 				<artifactId>mariadb-java-client</artifactId>
-				<version>2.7.6</version>
+				<version>${mariadb-java-client.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -74,6 +78,12 @@
 		<dependency>
 			<groupId>org.jdbi</groupId>
 			<artifactId>jdbi3-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>${jsr305.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.quarkus</groupId>
