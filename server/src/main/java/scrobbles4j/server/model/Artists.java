@@ -17,12 +17,14 @@ package scrobbles4j.server.model;
 
 import scrobbles4j.model.Artist;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.reflect.ConstructorMapper;
 
 /**
  * Repository for artists.
@@ -48,10 +50,49 @@ public final class Artists {
 	public Optional<Artist> findByName(String name) {
 
 		return this.db.withHandle(handle -> handle
-			.createQuery("SELECT a.artist FROM artists a WHERE lower(a.artist) = lower(:artist)")
+			.registerRowMapper(ConstructorMapper.factory(Artist.class))
+			.createQuery("SELECT a.artist AS name FROM artists a WHERE lower(a.artist) = lower(:artist)")
 			.bind("artist", name)
-			.map((rs, ctx) -> new Artist(rs.getString(1)))
+			.mapTo(Artist.class)
 			.findOne()
+		);
+	}
+
+	/**
+	 * Finds related artist
+	 *
+	 * @param artist The artist to which related artists shall be found
+	 * @return A list of related artists
+	 */
+	public List<Artist> findRelated(Artist artist) {
+
+		var statement = """
+			SELECT tgt.artist AS name
+			FROM artists a
+			JOIN related_artists r ON r.source_id = a.id
+			JOIN artists tgt ON tgt.id = r.target_id
+			WHERE a.artist = :artist
+			UNION
+			SELECT tgt.artist AS name
+			FROM artists a
+			JOIN related_artists r ON r.target_id = a.id
+			JOIN artists tgt ON tgt.id = r.source_id
+			WHERE a.artist = :artist
+			UNION
+			SELECT a.artist AS name
+			FROM tracks t
+			JOIN artists a ON a.id = t.artist_id
+			WHERE (lower(t.name) like lower('%[feat. ' || :artist || ']') OR lower(t.name) like lower('%[with ' || :artist || ']'))
+			  AND t.year IS NOT NULL
+			ORDER BY name
+			""";
+
+		return this.db.withHandle(handle -> handle
+			.registerRowMapper(ConstructorMapper.factory(Artist.class))
+			.createQuery(statement)
+			.bind("artist", artist.name())
+			.mapTo(Artist.class)
+			.list()
 		);
 	}
 }

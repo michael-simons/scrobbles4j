@@ -14,78 +14,90 @@
         </nav>
 
         <main>
-            <h2 id="top-tracks">Top 10 Tracks overall<sup>1, 2</sup></h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Rank</th>
-                        <th scope="col">Artist</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Number of times played</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#let rankFormatter=inject:rankFormatter.get()}
-                    {#for entry in topTracks}
-                    <tr>
-                        <th scope="row">{rankFormatter.format(entry.rank)}</th>
-                        <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
-                        <td>{entry.name}</td>
-                        <td>{entry.cnt}</td>
-                    </tr>
-                    {/for}
-                    {/let}
-                </tbody>
-            </table>
+            {#if !topTracks.empty}
+            <section>
+                <h2 id="top-tracks">Top 10 Tracks overall<sup>1, 2</sup></h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Artist</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Number of times played</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#let rankFormatter=inject:rankFormatter.get()}
+                        {#for entry in topTracks}
+                        <tr>
+                            <th scope="row">{rankFormatter.format(entry.rank)}</th>
+                            <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
+                            <td>{entry.name}</td>
+                            <td>{entry.cnt}</td>
+                        </tr>
+                        {/for}
+                        {/let}
+                    </tbody>
+                </table>
+            </section>
+            {/if}
 
-            <h2 id="top-albums">Top 10 Albums overall<sup>1</sup></h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Rank</th>
-                        <th scope="col">Artist</th>
-                        <th scope="col">Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#let rankFormatter=inject:rankFormatter.get()}
-                    {#for entry in topAlbums}
-                    <tr>
-                        <th scope="row">{rankFormatter.format(entry.rank)}</th>
-                        <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
-                        <td>{entry.name}</td>
-                    </tr>
-                    {/for}
-                    {/let}
-                </tbody>
-            </table>
+            {#if !topAlbums.empty}
+            <section>
+                <h2 id="top-albums">Top 10 Albums overall<sup>1</sup></h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Artist</th>
+                            <th scope="col">Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#let rankFormatter=inject:rankFormatter.get()}
+                        {#for entry in topAlbums}
+                        <tr>
+                            <th scope="row">{rankFormatter.format(entry.rank)}</th>
+                            <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
+                            <td>{entry.name}</td>
+                        </tr>
+                        {/for}
+                        {/let}
+                    </tbody>
+                </table>
+            </section>
+            {/if}
 
-            <h2 id="top-artists">Favorite artists per year in the last decade<sup>1, 3</sup></h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Rank</th>
-                        <th scope="col">Artist</th>
-                        <th scope="col">Change</th>
-                    </tr>
-                </thead>
-                {#for year in favoriteArtists}
-                <tbody class="one-of-many">
-                    <tr>
-                        <th colspan="3"><a href="/charts/{year.key}">{year.key}</a></th>
-                    </tr>
-                    {#let rankFormatter=inject:rankFormatter.get()}
-                    {#for entry in year.value}
-                    <tr>
-                        <th scope="row">{rankFormatter.format(entry.rank)}</th>
-                        <td><a href="/charts/artist?q={str:urlEncode(entry.name)}">{entry.name}</a></td>
-                        <td>{entry.change}</td>
-                    </tr>
+            {#if !favoriteArtists.empty}
+            <section>
+                <h2 id="top-artists">Favorite artists per year in the last decade<sup>1, 3</sup></h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Artist</th>
+                            <th scope="col">Change</th>
+                        </tr>
+                    </thead>
+                    {#for year in favoriteArtists}
+                    <tbody class="one-of-many">
+                        <tr>
+                            <th colspan="3"><a href="/charts/{year.key}">{year.key}</a></th>
+                        </tr>
+                        {#let rankFormatter=inject:rankFormatter.get()}
+                        {#for entry in year.value}
+                        <tr>
+                            <th scope="row">{rankFormatter.format(entry.rank)}</th>
+                            <td><a href="/charts/artist?q={str:urlEncode(entry.name)}">{entry.name}</a></td>
+                            <td>{entry.change}</td>
+                        </tr>
+                        {/for}
+                        {/let}
+                    </tbody>
                     {/for}
-                    {/let}
-                </tbody>
-                {/for}
-            </table>
+                </table>
+            </section>
+            {/if}
 
             <p>
                 <sup>1</sup>Compilations are excluded.<br />

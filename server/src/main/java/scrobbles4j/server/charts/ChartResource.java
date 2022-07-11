@@ -18,10 +18,12 @@ package scrobbles4j.server.charts;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
+import scrobbles4j.server.model.Albums;
 import scrobbles4j.server.model.Artists;
 
 import java.time.Year;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -34,6 +36,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.microprofile.context.ManagedExecutor;
+
 /**
  * Returning charts.
  *
@@ -42,9 +46,13 @@ import javax.ws.rs.core.Response;
 @Path("/charts")
 public class ChartResource {
 
+	private final ManagedExecutor managedExecutor;
+
 	private final ChartService chartService;
 
 	private final Artists artists;
+
+	private final Albums albums;
 
 	private final Template indexTemplate;
 
@@ -52,23 +60,40 @@ public class ChartResource {
 
 	private final Template artistTemplate;
 
-
+	/**
+	 * Create a new instance of this resource
+	 *
+	 * @param managedExecutor Needed for a couple of database requests
+	 * @param chartService    Access to charts
+	 * @param artists         Access to artists
+	 * @param albums          Access to albums
+	 * @param indexTemplate   The view for the main entry
+	 * @param yearTemplate    The year view
+	 * @param artistTemplate  The artist view
+	 */
 	@Inject
 	public ChartResource(
+		ManagedExecutor managedExecutor,
 		ChartService chartService,
 		Artists artists,
+		Albums albums,
 		@Location("charts/index") Template indexTemplate,
 		@Location("charts/year") Template yearTemplate,
 		@Location("charts/artist") Template artistTemplate
 	) {
+		this.managedExecutor = managedExecutor;
 		this.chartService = chartService;
 		this.artists = artists;
+		this.albums = albums;
 
 		this.indexTemplate = indexTemplate;
 		this.yearTemplate = yearTemplate;
 		this.artistTemplate = artistTemplate;
 	}
 
+	/**
+	 * {@return charts overview}
+	 */
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance index() {
@@ -81,6 +106,12 @@ public class ChartResource {
 			.data("favoriteArtists", this.chartService.getFavoriteArtistsByYears(numArtists, 10));
 	}
 
+	/**
+	 * Charts per year
+	 *
+	 * @param year The year in question
+	 * @return A view
+	 */
 	@GET
 	@Path("/{year: (\\d+)}")
 	@Produces(MediaType.TEXT_HTML)
@@ -95,6 +126,12 @@ public class ChartResource {
 			.data("topArtists", this.chartService.getTopNArtists(10, year));
 	}
 
+	/**
+	 * Charts per artist
+	 *
+	 * @param q Required query paramter for selecting the artist
+	 * @return A view
+	 */
 	@GET
 	@Path("/artist")
 	@Produces(MediaType.TEXT_HTML)
@@ -106,10 +143,19 @@ public class ChartResource {
 		var artist = artists.findByName(artistName)
 			.orElseThrow(() -> new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("No such artist.").build()));
 
-		var topTracks = this.chartService.getTopNTracks(20, Optional.empty(), Optional.of(artist));
+		var topTracks = CompletableFuture
+			.supplyAsync(() -> this.chartService.getTopNTracks(20, Optional.empty(), Optional.of(artist)), managedExecutor);
+
+		var albumsByArtists = CompletableFuture
+			.supplyAsync(() -> this.albums.findByArtist(artist), managedExecutor);
+
+		var relatedArtists = CompletableFuture
+			.supplyAsync(() -> this.artists.findRelated(artist), managedExecutor);
 
 		return this.artistTemplate
 			.data("artist", artist)
-			.data("topTracks", topTracks);
+			.data("topTracks", topTracks)
+			.data("albumsByArtists", albumsByArtists)
+			.data("relatedArtists", relatedArtists);
 	}
 }

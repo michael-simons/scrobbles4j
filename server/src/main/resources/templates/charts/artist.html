@@ -15,32 +15,64 @@
         </nav>
 
         <main>
-            <h2 id="top-tracks">Top 20 Tracks by {artist.name}<sup>1, 2</sup></h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Rank</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Number of times played</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#let rankFormatter=inject:rankFormatter.get()}
-                    {#for entry in topTracks}
-                    <tr>
-                        <th scope="row">{rankFormatter.format(entry.rank)}</th>
-                        <td>{entry.name}</td>
-                        <td>{entry.cnt}</td>
-                    </tr>
-                    {/for}
-                    {/let}
-                </tbody>
-            </table>
+            {#if !topTracks.empty}
+            <section>
+                <h2 id="top-tracks">Top 20 Tracks by {artist.name}<sup>1, 2</sup></h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Number of times played</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#let rankFormatter=inject:rankFormatter.get()}
+                        {#for entry in topTracks}
+                        <tr>
+                            <th scope="row">{rankFormatter.format(entry.rank)}</th>
+                            <td>{entry.name}</td>
+                            <td>{entry.cnt}</td>
+                        </tr>
+                        {/for}
+                        {/let}
+                    </tbody>
+                </table>
 
-            <p>
-                <sup>1</sup>Compilations are excluded.<br />
-                <sup>2</sup>Tracks are aggregated by artist and track name which means that potentially different versions of a track on different albums are counted together. A track must have been played at least 2 times to appear.
-            </p>
+                <p>
+                    <sup>1</sup>Compilations are excluded.<br />
+                    <sup>2</sup>Tracks are aggregated by artist and track name which means that potentially different versions of a track on different albums are counted together. A track must have been played at least 2 times to appear.
+                </p>
+            </section>
+            {/if}
+
+            {#if !relatedArtists.empty}
+            <section>
+                <h2 id="related-artist">Related artists</h2>
+                <ul>
+                    {#for artist in relatedArtists}
+                        <li><span class="artist"><a href="/charts/artist?q={str:urlEncode(artist.name)}">{artist.name}</a></span></li>
+                    {/for}
+                </ul>
+            </section>
+            {/if}
+
+            {#if !albumsByArtists.empty}
+                <section>
+                <h2 id="albums">Albums by or with {artist.name}</h2>
+                <ul>
+                {#for entry in albumsByArtists}
+                    <li>
+                    <span class="name">{entry.key.name}</span> (<span class="year">{entry.key.year}</span>)
+                    {#for artist in entry.value}
+                        {#if artist_isFirst}with{/if}
+                        <span class="artist"><a href="/charts/artist?q={str:urlEncode(artist.name)}">{artist.name}</a></span>{#if !artist_isLast}, {/if}
+                    {/for}
+                    </li>
+                {/for}
+                </ul>
+                </section>
+            {/if}
         </main>
         <footer>
             <p>
