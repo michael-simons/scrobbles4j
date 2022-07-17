@@ -43,6 +43,10 @@ public class IndexResource {
 
 	private final Template index;
 
+	/**
+	 * @param scrobbleService Needed to access scrobbles
+	 * @param index           Template for the main view
+	 */
 	@Inject
 	public IndexResource(ScrobbleService scrobbleService, @Location("scrobbles/index") Template index) {
 
@@ -50,6 +54,12 @@ public class IndexResource {
 		this.index = index;
 	}
 
+	/**
+	 * An overview about the recently played tracks
+	 *
+	 * @param uriInfo Needed to derive links
+	 * @return A template instance
+	 */
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance index(@Context UriInfo uriInfo) {

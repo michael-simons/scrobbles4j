@@ -26,6 +26,9 @@ import java.time.Year;
  */
 public record YearStats(Year year, int numScrobbles, Duration totalDuration) {
 
+	/**
+	 * {@return a formatted, total duration (in days, hours and minutes) of playtime}
+	 */
 	public String formattedTotalDuration() {
 		if (totalDuration.isZero()) {
 			return "";
@@ -35,6 +38,9 @@ public record YearStats(Year year, int numScrobbles, Duration totalDuration) {
 			totalDuration.toMinutesPart());
 	}
 
+	/**
+	 * {@return true if there are no plays in this year}
+	 */
 	public boolean empty() {
 		return totalDuration.isZero() || numScrobbles == 0;
 	}

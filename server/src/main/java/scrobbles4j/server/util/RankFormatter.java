@@ -44,6 +44,12 @@ public final class RankFormatter {
 	private RankFormatter() {
 	}
 
+	/**
+	 * Return the current rank if the current rank is higer than the previous one, otherwise returns an empty string
+	 *
+	 * @param rank The current rank
+	 * @return A string with the rank if it changed
+	 */
 	public String format(int rank) {
 
 		if (previous.compareAndSet(rank - 1, rank)) {
