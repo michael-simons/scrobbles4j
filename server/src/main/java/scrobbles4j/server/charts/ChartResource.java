@@ -27,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -92,15 +93,17 @@ public class ChartResource {
 	}
 
 	/**
-	 * {@return charts overview}
+	 * @param includeCompilations Flag if compilations should be included while computing the track list
+	 * @return charts overview
 	 */
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	public TemplateInstance index() {
+	public TemplateInstance index(@QueryParam("includeCompilations") @DefaultValue("true") boolean includeCompilations) {
 
 		var numArtists = 10;
 		return indexTemplate
-			.data("topTracks", this.chartService.getTopNTracks(10, Optional.empty(), Optional.empty()))
+			.data("includeCompilations", includeCompilations)
+			.data("topTracks", this.chartService.getTopNTracks(10, Optional.empty(), Optional.empty(), includeCompilations))
 			.data("topAlbums", this.chartService.getTopNAlbums(10, Optional.empty()))
 			.data("numArtists", numArtists)
 			.data("favoriteArtists", this.chartService.getFavoriteArtistsByYears(numArtists, 10));
@@ -109,18 +112,23 @@ public class ChartResource {
 	/**
 	 * Charts per year
 	 *
-	 * @param year The year in question
+	 * @param year                The year in question
+	 * @param includeCompilations Flag if compilations should be included while computing the track list
 	 * @return A view
 	 */
 	@GET
 	@Path("/{year: (\\d+)}")
 	@Produces(MediaType.TEXT_HTML)
-	public TemplateInstance year(@PathParam("year") Year year) {
+	public TemplateInstance year(
+		@PathParam("year") Year year,
+		@QueryParam("includeCompilations") @DefaultValue("true") boolean includeCompilations
+	) {
 
 		return this.yearTemplate
 			.data("year", year)
+			.data("includeCompilations", includeCompilations)
 			.data("scrobbleStats", this.chartService.getStats(year))
-			.data("topTracks", this.chartService.getTopNTracks(5, Optional.of(year), Optional.empty()))
+			.data("topTracks", this.chartService.getTopNTracks(5, Optional.of(year), Optional.empty(), includeCompilations))
 			.data("topNewTracks", this.chartService.getTopNNewTracksInYear(5, year))
 			.data("topAlbums", this.chartService.getTopNAlbums(10, Optional.of(year)))
 			.data("topArtists", this.chartService.getTopNArtists(10, year));
@@ -129,13 +137,14 @@ public class ChartResource {
 	/**
 	 * Charts per artist
 	 *
-	 * @param q Required query paramter for selecting the artist
+	 * @param q                   Required query paramter for selecting the artist
+	 * @param includeCompilations Flag if compilations should be included while computing the track list
 	 * @return A view
 	 */
 	@GET
 	@Path("/artist")
 	@Produces(MediaType.TEXT_HTML)
-	public TemplateInstance artist(@QueryParam("q") String q) {
+	public TemplateInstance artist(@QueryParam("q") String q, @QueryParam("includeCompilations") @DefaultValue("true") boolean includeCompilations) {
 
 		var artistName = Optional.ofNullable(q).map(String::trim).filter(Predicate.not(String::isBlank))
 			.orElseThrow(() -> new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Query parameter is mandatory.").build()));
@@ -144,7 +153,7 @@ public class ChartResource {
 			.orElseThrow(() -> new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity("No such artist.").build()));
 
 		var topTracks = CompletableFuture
-			.supplyAsync(() -> this.chartService.getTopNTracks(20, Optional.empty(), Optional.of(artist)), managedExecutor);
+			.supplyAsync(() -> this.chartService.getTopNTracks(20, Optional.empty(), Optional.of(artist), includeCompilations), managedExecutor);
 
 		var albumsByArtists = CompletableFuture
 			.supplyAsync(() -> this.albums.findByArtist(artist), managedExecutor);
@@ -153,6 +162,7 @@ public class ChartResource {
 			.supplyAsync(() -> this.artists.findRelated(artist), managedExecutor);
 
 		return this.artistTemplate
+			.data("includeCompilations", includeCompilations)
 			.data("artist", artist)
 			.data("topTracks", topTracks)
 			.data("albumsByArtists", albumsByArtists)

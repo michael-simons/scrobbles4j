@@ -117,11 +117,13 @@ final class ChartService {
 	}
 
 	/**
-	 * @param maxRank The maximum rank to be included
-	 * @param year    An optional year in which the entries had been play
+	 * @param maxRank             The maximum rank to be included
+	 * @param year                An optional year in which the entries had been play
+	 * @param artist              An optional artist to query for
+	 * @param includeCompilations A flag to include tracks from compilations or not
 	 * @return A list of chart entries for tracks
 	 */
-	Collection<EntryTrack> getTopNTracks(int maxRank, Optional<Year> year, Optional<Artist> artist) {
+	Collection<EntryTrack> getTopNTracks(int maxRank, Optional<Year> year, Optional<Artist> artist, boolean includeCompilations) {
 
 		var statement = """
 			SELECT * FROM (
@@ -134,7 +136,7 @@ final class ChartService {
 			  JOIN artists a ON a.id = t.artist_id
 			  WHERE (:year IS NULL OR year(p.played_on) = :year)
 			    AND (:artist IS NULL OR lower(a.artist) = lower(:artist))
-			    AND t.compilation = 'f'
+			    AND nvl(:compilation, t.compilation) = 'f'
 			  GROUP BY a.artist, t.name
 			  HAVING count(*) >= 2
 			) src
@@ -150,6 +152,7 @@ final class ChartService {
 				.ifPresentOrElse(value -> query.bind("artist", value), () -> query.bindNull("artist", Types.CHAR));
 			return query
 				.bind("maxRank", maxRank)
+				.bind("compilation", includeCompilations ? "f" : null)
 				.map((rs, ctx) -> new EntryTrack(rs.getInt("rank"), rs.getInt("cnt"), rs.getString("artist"),
 					rs.getString("name")))
 				.collect(Collectors.toList());

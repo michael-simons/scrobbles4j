@@ -22,9 +22,16 @@
             </p>
             {/if}
 
-            {#if !topTracks.empty}
             <section>
-                <h2 id="top-tracks">Top 5 Tracks in {year}<sup>1, 2</sup></h2>
+                <h2 id="top-tracks">Top 5 Tracks in {year}<sup>1</sup></h2>
+                <p>
+                    {#if includeCompilations}
+                        <a href="?includeCompilations=false">Ignore tracks from compilations</a>
+                    {#else}
+                        <a href="?includeCompilations=true">Include tracks from compilations</a>
+                    {/if}
+                </p>
+                {#if !topTracks.empty}
                 <table class="table">
                     <thead>
                         <tr>
@@ -47,12 +54,13 @@
                         {/let}
                     </tbody>
                 </table>
+                {/if}
             </section>
-            {/if}
+
 
             {#if !topNewTracks.empty}
             <section>
-                <h2 id="top-new-tracks">Top 5 new Tracks in {year}<sup>1, 3</sup></h2>
+                <h2 id="top-new-tracks">Top 5 new Tracks in {year}<sup>2, 3</sup></h2>
                 <table class="table">
                     <thead>
                         <tr>
@@ -80,7 +88,7 @@
 
             {#if !topAlbums.empty}
             <section>
-                <h2 id="top-albums">Top 10 Albums in {year}<sup>1</sup></h2>
+                <h2 id="top-albums">Top 10 Albums in {year}<sup>2</sup></h2>
                 <table class="table">
                     <thead>
                         <tr>
@@ -106,7 +114,7 @@
 
             {#if !topArtists.empty}
             <section>
-                <h2 id="top-artists">Top 10 Artists in {year}<sup>1</sup></h2>
+                <h2 id="top-artists">Top 10 Artists in {year}<sup>2</sup></h2>
                 <table class="table">
                     <thead>
                         <tr>
@@ -131,8 +139,8 @@
             {/if}
 
             <p>
-                <sup>1</sup>Compilations are excluded.<br />
-                <sup>2</sup>Tracks are aggregated by artist and track name which means that potentially different versions of a track on different albums are counted together. A track must have been played at least 2 times to appear.<br />
+                <sup>1</sup>Tracks are aggregated by artist and track name which means that potentially different versions of a track on different albums are counted together. A track must have been played at least 2 times to appear.<br />
+                <sup>2</sup>Compilations are excluded.<br />
                 <sup>3</sup>Those are tracks that have been released and played the first time in {year}.
             </p>
         </main>
