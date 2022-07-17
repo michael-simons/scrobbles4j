@@ -98,7 +98,7 @@ public class ChartResource {
 	 */
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	public TemplateInstance index(@QueryParam("includeCompilations") @DefaultValue("true") boolean includeCompilations) {
+	public TemplateInstance index(@QueryParam("includeCompilations") @DefaultValue("false") boolean includeCompilations) {
 
 		var numArtists = 10;
 		return indexTemplate
