@@ -24,4 +24,11 @@ import java.time.Instant;
  * @param numScrobbles how many tracks have been scrobbled
  */
 public record ScrobbleStats(Instant first, Instant latest, int numScrobbles) {
+
+	/**
+	 * {@return true if there are no scrobbles}
+	 */
+	public boolean isEmpty() {
+		return numScrobbles == 0;
+	}
 }

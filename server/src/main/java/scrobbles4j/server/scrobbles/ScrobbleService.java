@@ -60,11 +60,15 @@ final class ScrobbleService {
 			FROM plays;
 			""";
 
-		return this.db.withHandle(handle -> handle.createQuery(statement).map((rs, ctx) -> new ScrobbleStats(
-			rs.getTimestamp("first").toInstant(),
-			rs.getTimestamp("latest").toInstant(),
-			rs.getInt("num_scrobbles")
-		)).one());
+		return this.db.withHandle(handle -> handle.createQuery(statement).map((rs, ctx) -> {
+			var first = rs.getTimestamp("first");
+			var latest = rs.getTimestamp("latest");
+			return new ScrobbleStats(
+				first == null ? null : first.toInstant(),
+				latest == null ? null : latest.toInstant(),
+				rs.getInt("num_scrobbles")
+			);
+		}).one());
 	}
 
 	/**
