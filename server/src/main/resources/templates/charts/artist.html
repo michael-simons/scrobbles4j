@@ -16,7 +16,7 @@
 
         <main>
             <section>
-                <h2 id="top-tracks">Top 20 Tracks by {artist.name}<sup>1</sup></h2>
+                <h2 id="top-tracks">Top 20 Tracks by {artist.name}<sup>1{#if !includeCompilations}, 2{/if}</sup></sup></h2>
                 <p>
                 {#if includeCompilations}
                     <a href="?q={str:urlEncode(artist.name)}&includeCompilations=false">Ignore tracks from compilations</a>
@@ -45,10 +45,12 @@
                         {/let}
                     </tbody>
                 </table>
-                <p>
-                    <sup>1</sup>Tracks are aggregated by artist and track name which means that potentially different versions of a track on different albums are counted together. A track must have been played at least 2 times to appear.
-                </p>
                 {/if}
+
+                <p>
+                    <sup>1</sup>Tracks are aggregated by artist and track name which means that potentially different versions of a track on different albums are counted together. A track must have been played at least 2 times to appear.<br />
+                    <sup>2</sup>Compilations are excluded.
+                </p>
             </section>
 
             {#if !relatedArtists.empty}

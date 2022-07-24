@@ -23,7 +23,7 @@
             {/if}
 
             <section>
-                <h2 id="top-tracks">Top 5 Tracks in {year}<sup>1</sup></h2>
+                <h2 id="top-tracks">Top 5 Tracks in {year}<sup>1{#if !includeCompilations}, 2{/if}</sup></sup></h2>
                 <p>
                     {#if includeCompilations}
                         <a href="?includeCompilations=false">Ignore tracks from compilations</a>
