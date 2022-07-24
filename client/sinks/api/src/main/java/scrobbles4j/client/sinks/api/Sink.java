@@ -49,8 +49,18 @@ public interface Sink {
 	default void init(Map<String, String> config) {
 	}
 
+	/**
+	 * This method is called by a source when a track is playing.
+	 *
+	 * @param event An event containing the playing track
+	 */
 	void onTrackPlaying(PlayingTrackEvent event);
 
+	/**
+	 * Consumes a list of played tracks in bulk.
+	 *
+	 * @param playedTracks A collection of played tracks
+	 */
 	default void consumeAll(Collection<PlayedTrack> playedTracks) {
 	}
 }

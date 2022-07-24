@@ -32,6 +32,9 @@ public abstract class AbstractSink implements Sink {
 	 */
 	private boolean initialized;
 
+	/**
+	 * Public constructor required by the Java Service API. Also marks this instance as not initialized.
+	 */
 	protected AbstractSink() {
 		lock = new Object();
 		initialized = false;

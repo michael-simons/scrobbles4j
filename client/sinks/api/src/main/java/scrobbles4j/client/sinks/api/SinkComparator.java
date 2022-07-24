@@ -25,6 +25,9 @@ import java.util.Comparator;
  */
 public enum SinkComparator implements Comparator<Sink> {
 
+	/**
+	 * The single instance of the {@link SinkComparator}.
+	 */
 	INSTANCE;
 
 	@Override

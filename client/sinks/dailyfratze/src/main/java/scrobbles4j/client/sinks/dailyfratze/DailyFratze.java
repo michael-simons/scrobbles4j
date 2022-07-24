@@ -82,6 +82,9 @@ public final class DailyFratze extends AbstractSink {
 	 */
 	private Function<String, String> encoder;
 
+	/**
+	 * Public constructor required by the Java Service API. Also used to initialize the user agent.
+	 */
 	public DailyFratze() {
 
 		var descriptor = getClass().getModule().getDescriptor();

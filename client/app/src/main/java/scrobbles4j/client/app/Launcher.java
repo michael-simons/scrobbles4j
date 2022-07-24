@@ -66,11 +66,19 @@ public final class Launcher implements Runnable {
 		""")
 	Map<String, String> config = Map.of();
 
+	/**
+	 * Standard entry point.
+	 *
+	 * @param args All args which are passed to PicoCLI.
+	 */
 	public static void main(String... args) {
 
 		new CommandLine(new Launcher()).execute(args);
 	}
 
+	/**
+	 * Subcommand that publishes only the selected tracks (in iTunes or Music)
+	 */
 	@Command(name = "publish-selected-tracks", description = "Use this option to publish selected tracks only.")
 	public void publishSelectedTracks() {
 
