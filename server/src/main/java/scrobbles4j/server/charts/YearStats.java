@@ -21,10 +21,12 @@ import java.time.Year;
 /**
  * @author Michael J. Simons
  * @param year          The year in question
+ * @param previousYear  The previous year
+ * @param nextYear      The next year
  * @param numScrobbles  Number of tracks played in the given year
  * @param totalDuration Total time
  */
-public record YearStats(Year year, int numScrobbles, Duration totalDuration) {
+public record YearStats(Year year, Year previousYear, Year nextYear, int numScrobbles, Duration totalDuration) {
 
 	/**
 	 * {@return a formatted, total duration (in days, hours and minutes) of playtime}

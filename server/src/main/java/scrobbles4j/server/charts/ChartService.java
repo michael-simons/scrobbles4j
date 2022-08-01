@@ -58,15 +58,21 @@ final class ChartService {
 	YearStats getStats(Year year) {
 
 		var statement = """
-			SELECT count(*) num_scrobbles, sum(duration) as total_duration
+			WITH prev AS (SELECT count(*) cnt, :year - 1 v FROM plays WHERE year(played_on) = :year - 1),
+			     next AS (SELECT count(*) cnt, :year + 1 v FROM plays WHERE year(played_on) = :year + 1)
+			SELECT prev.v AS previous_year, next.v AS next_year, count(*) AS num_scrobbles, sum(duration) AS total_duration
 			FROM tracks t JOIN plays p ON t.id = p.track_id
-			WHERE year(p.played_on) = :year
+			LEFT OUTER JOIN prev ON prev.cnt <> 0
+			LEFT OUTER JOIN next ON next.cnt <> 0
+			WHERE year(p.played_on) = :year;
 			""";
 
 		return this.db.withHandle(handle -> handle.createQuery(statement)
 			.bind("year", year.getValue())
 			.map((rs, ctx) -> new YearStats(
 				year,
+				Optional.ofNullable(rs.getObject("previous_year", Integer.class)).map(Year::of).orElse(null),
+				Optional.ofNullable(rs.getObject("next_year", Integer.class)).map(Year::of).orElse(null),
 				rs.getInt("num_scrobbles"),
 				Duration.ofSeconds(rs.getLong("total_duration"))
 			)).one());

@@ -10,7 +10,9 @@
             <ul>
                 <li><a href="/">Start</a></li>
                 <li><a href="/charts">Charts</a></li>
-                <li>{year}</li>
+                <li>
+                    {#if scrobbleStats.previousYear}<a href="/charts/{scrobbleStats.previousYear}">«</a>&nbsp;{/if}{year}{#if scrobbleStats.nextYear}&nbsp;<a href="/charts/{scrobbleStats.nextYear}">»</a>{/if}
+                </li>
             </ul>
         </nav>
 
