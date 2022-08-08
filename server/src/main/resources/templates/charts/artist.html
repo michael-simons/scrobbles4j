@@ -19,7 +19,7 @@
                 <h2 id="top-tracks">Top 20 Tracks by {artist.name}<sup>1{#if !includeCompilations}, 2{/if}</sup></sup></h2>
                 <p>
                 {#if includeCompilations}
-                    <a href="?q={str:urlEncode(artist.name)}&includeCompilations=false">Ignore tracks from compilations</a>
+                    <a href="?q={str:urlEncode(artist.name)}&includeCompilations=false">Exclude tracks from compilations</a>
                 {#else}
                     <a href="?q={str:urlEncode(artist.name)}&includeCompilations=true">Include tracks from compilations</a>
                 {/if}
