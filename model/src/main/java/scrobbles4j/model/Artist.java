@@ -15,11 +15,22 @@
  */
 package scrobbles4j.model;
 
+import java.net.URI;
+
 /**
  * Representation of an artist.
  *
  * @author Michael J. Simons
  * @param name Name of the artist
+ * @param wikipediaLink An optional link to the artists wikipedia page.
  */
-public record Artist(String name) {
+public record Artist(String name, URI wikipediaLink) {
+
+	/**
+	 * Creates an artist without a link to the wikipedia
+	 * @param name Name of the artist
+	 */
+	public Artist(String name) {
+		this(name, null);
+	}
 }

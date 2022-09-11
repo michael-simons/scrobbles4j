@@ -15,11 +15,17 @@
  */
 package scrobbles4j.server.config;
 
+import java.net.URI;
+
 import javax.enterprise.inject.Produces;
 import javax.inject.Singleton;
 import javax.sql.DataSource;
 
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.reflect.ConstructorMapper;
+
+import scrobbles4j.model.Artist;
+import scrobbles4j.server.model.Album;
 
 /**
  * Creates a global instance of {@link Jdbi} based on the one {@link DataSource}.
@@ -31,10 +37,21 @@ public final class JdbiProducer {
 	/**
 	 * @param dataSource The datasource for which Jdbi should be produced
 	 * @return a Jdbi instance
+	 * @throws Exception for everything that can happen while determining model constructors
 	 */
 	@Produces
 	@Singleton
-	public Jdbi jdbi(DataSource dataSource) {
-		return Jdbi.create(dataSource);
+	public Jdbi jdbi(DataSource dataSource) throws Exception {
+
+		return Jdbi.create(dataSource)
+			.registerColumnMapper(URI.class, (rs, col, ctx) -> {
+				var value = rs.getString(col);
+				if (value == null || value.isBlank()) {
+					return null;
+				}
+				return URI.create(value);
+			})
+			.registerRowMapper(Album.class, ConstructorMapper.of(Album.class, "album"))
+			.registerRowMapper(Artist.class, ConstructorMapper.of(Artist.class.getConstructor(String.class), "artist"));
 	}
 }

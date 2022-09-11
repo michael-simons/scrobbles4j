@@ -64,13 +64,13 @@ public class ChartResource {
 	/**
 	 * Create a new instance of this resource
 	 *
-	 * @param managedExecutor Needed for a couple of database requests
-	 * @param chartService    Access to charts
-	 * @param artists         Access to artists
-	 * @param albums          Access to albums
-	 * @param indexTemplate   The view for the main entry
-	 * @param yearTemplate    The year view
-	 * @param artistTemplate  The artist view
+	 * @param managedExecutor  Needed for a couple of database requests
+	 * @param chartService     Access to charts
+	 * @param artists          Access to artists
+	 * @param albums           Access to albums
+	 * @param indexTemplate    The view for the main entry
+	 * @param yearTemplate     The year view
+	 * @param artistTemplate   The artist view
 	 */
 	@Inject
 	public ChartResource(
@@ -137,7 +137,7 @@ public class ChartResource {
 	/**
 	 * Charts per artist
 	 *
-	 * @param q                   Required query paramter for selecting the artist
+	 * @param q                   Required query parameter for selecting the artist
 	 * @param includeCompilations Flag if compilations should be included while computing the track list
 	 * @return A view
 	 */
@@ -164,6 +164,7 @@ public class ChartResource {
 		return this.artistTemplate
 			.data("includeCompilations", includeCompilations)
 			.data("artist", artist)
+			.data("summary", artists.getSummary(artist))
 			.data("topTracks", topTracks)
 			.data("albumsByArtists", albumsByArtists)
 			.data("relatedArtists", relatedArtists);

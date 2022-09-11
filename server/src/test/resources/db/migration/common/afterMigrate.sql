@@ -4,12 +4,12 @@ DELETE FROM genres;
 DELETE FROM artists;
 DELETE FROM related_artists;
 
-INSERT INTO artists VALUES (1, 'In Flames');
-INSERT INTO artists VALUES (2, 'Danger Dan');
-INSERT INTO artists VALUES (3, 'Juse Ju');
-INSERT INTO artists VALUES (4, 'Queen');
-INSERT INTO artists VALUES (5, 'Freddie Mercury');
-INSERT INTO artists VALUES (6, 'Roger Taylor');
+INSERT INTO artists VALUES (1, 'In Flames', 'https://en.wikipedia.org/wiki/In_Flames');
+INSERT INTO artists VALUES (2, 'Danger Dan', 'https://de.wikipedia.org/wiki/Danger_Dan');
+INSERT INTO artists VALUES (3, 'Juse Ju', null);
+INSERT INTO artists VALUES (4, 'Queen', null);
+INSERT INTO artists VALUES (5, 'Freddie Mercury', null);
+INSERT INTO artists VALUES (6, 'Roger Taylor', null);
 INSERT INTO related_artists VALUES (4, 5);
 INSERT INTO related_artists VALUES (6, 4);
 INSERT INTO genres VALUES (1, 'Death Metal');

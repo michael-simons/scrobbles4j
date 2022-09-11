@@ -15,6 +15,13 @@
         </nav>
 
         <main>
+            {#if summary.present}
+            <section>
+                <h2>{artist.name}</h2>
+                <p>{summary}</p>
+                <p>Read more at: <a href="{artist.wikipediaLink}">{artist.wikipediaLink}</a></p>
+            </section>
+            {/if}
             <section>
                 <h2 id="top-tracks">Top 20 Tracks by {artist.name}<sup>1{#if !includeCompilations}, 2{/if}</sup></sup></h2>
                 <p>

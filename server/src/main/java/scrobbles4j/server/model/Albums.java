@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.mapper.reflect.ConstructorMapper;
 
 import scrobbles4j.model.Artist;
 
@@ -69,8 +68,6 @@ public final class Albums {
 			""";
 
 		return this.db.withHandle(handle -> handle
-			.registerRowMapper(ConstructorMapper.factory(Album.class, "album"))
-			.registerRowMapper(ConstructorMapper.factory(Artist.class, "artist"))
 			.createQuery(statement)
 			.bind("artist", artist.name())
 			.reduceRows(new LinkedHashMap<>(), (m, rv) -> {

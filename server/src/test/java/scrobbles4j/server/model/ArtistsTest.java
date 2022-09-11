@@ -31,6 +31,13 @@ class ArtistsTest {
 	Artists artists;
 
 	@Test
+	void findByNameShouldWork() {
+
+		var artist = artists.findByName("Queen");
+		assertThat(artist).hasValue(new Artist("Queen"));
+	}
+
+	@Test
 	void getAlbumsByArtistsShouldWork() {
 
 		var relatedToQueen = artists.findRelated(new Artist("Queen"));

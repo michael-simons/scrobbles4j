@@ -1,0 +1,1 @@
+ALTER TABLE artists ADD COLUMN IF NOT EXISTS wikipedia_link VARCHAR(512);

@@ -22,6 +22,7 @@ import scrobbles4j.model.PlayedTrack;
 import scrobbles4j.model.Track;
 import scrobbles4j.model.TrackNumber;
 
+import java.net.URI;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.Year;
@@ -93,7 +94,7 @@ final class ScrobbleService {
 	Collection<PlayedTrack> getLatest(int maxResults, Instant cutOffDate) {
 
 		var statement = """
-			SELECT a.artist, g.genre,
+			SELECT a.artist, a.wikipedia_link, g.genre,
 			       t.*,
 			       p.played_on
 			FROM plays p
@@ -110,7 +111,8 @@ final class ScrobbleService {
 			.bind("maxResults", maxResults)
 			.map((rs, ctx) -> {
 
-				var artist = new Artist(rs.getString("artist"));
+				var wikipediaLink = rs.getString("wikipedia_link") == null ? null : URI.create(rs.getString("wikipedia_link"));
+				var artist = new Artist(rs.getString("artist"), wikipediaLink);
 				var genre = new Genre(rs.getString("genre"));
 				var trackNumber = new TrackNumber(rs.getInt("track_number"),
 					rs.getObject("track_count", Integer.class));
