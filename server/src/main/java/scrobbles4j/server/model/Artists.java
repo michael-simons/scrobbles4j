@@ -77,7 +77,9 @@ public final class Artists {
 	}
 
 	/**
-	 * @param artist The artist to retrieve the summary for. Must have a non-null, non-blank wikipedia link
+	 * Retrieves the summary from the Artists main wikipedia page if available.
+	 *
+	 * @param artist The artist to retrieve the summary for
 	 * @return An optional future summary
 	 */
 	public CompletableFuture<Optional<String>> getSummary(Artist artist) {
