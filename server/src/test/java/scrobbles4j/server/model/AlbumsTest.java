@@ -17,6 +17,7 @@ package scrobbles4j.server.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ class AlbumsTest {
 	@Test
 	void findAlbumsByArtistsShouldWork() {
 
-		var albumsByDangerDan = albums.findByArtist(new Artist("Danger Dan"));
+		var albumsByDangerDan = albums.findByArtist(new Artist("Danger Dan", URI.create("https://de.wikipedia.org/wiki/Danger_Dan")));
 		assertThat(albumsByDangerDan)
 			.hasSize(2)
 			.contains(

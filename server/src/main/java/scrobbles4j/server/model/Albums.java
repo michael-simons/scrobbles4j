@@ -73,7 +73,7 @@ public final class Albums {
 			.reduceRows(new LinkedHashMap<>(), (m, rv) -> {
 				var artists = m.computeIfAbsent(rv.getRow(Album.class), album -> new TreeSet<>(Comparator.comparing(Artist::name)));
 				var albumArtist = rv.getRow(Artist.class);
-				if (!albumArtist.equals(artist)) {
+				if (!albumArtist.name().equals(artist.name())) {
 					artists.add(albumArtist);
 				}
 				return m;
