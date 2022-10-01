@@ -83,3 +83,13 @@ NOTE: As the scrobbler backend is not yet implemented, the live data behind the 
       read only access and a couple of views onto the original source. 
       CQRS on the database level. Thanks https://twitter.com/jordisola_/status/1444225890800525316[ᴊᴏʀᴅɪ]
       for a fitting description.
+
+== Misc
+
+A local database can be brought up independent of Quarkus like this:
+
+----
+docker run -v `pwd`/var/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=music -e MYSQL_USER=music -e MYSQL_PASSWORD=music --publish=3306:3306  mariadb:10.9
+----
+
+It will store it's data in a local folder, so it will be there after the container has been deleted and restarted.
