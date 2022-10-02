@@ -45,7 +45,7 @@ public final class RankFormatter {
 	}
 
 	/**
-	 * Return the current rank if the current rank is higer than the previous one, otherwise returns an empty string
+	 * Return the current rank if the current rank is higher than the previous one, otherwise returns an empty string
 	 *
 	 * @param rank The current rank
 	 * @return A string with the rank if it changed
