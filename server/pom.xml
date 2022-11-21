@@ -10,7 +10,7 @@
 	<artifactId>scrobbles4j.server</artifactId>
 	<properties>
 		<jsr305.version>3.0.2</jsr305.version>
-		<mariadb-java-client.version>2.7.7</mariadb-java-client.version>
+		<mariadb-java-client.version>3.1.0</mariadb-java-client.version>
 	</properties>
 
 	<dependencyManagement>
