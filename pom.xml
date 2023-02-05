@@ -63,7 +63,7 @@
 		<quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
 		<quarkus.platform.version>2.16.0.Final</quarkus.platform.version>
 		<slf4j.version>1.7.36</slf4j.version>
-		<sortpom-maven-plugin.version>3.2.0</sortpom-maven-plugin.version>
+		<sortpom-maven-plugin.version>3.2.1</sortpom-maven-plugin.version>
 		<wiremock.version>2.35.0</wiremock.version>
 	</properties>
 
