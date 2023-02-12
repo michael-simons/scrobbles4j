@@ -56,7 +56,7 @@ public final class Albums {
 			SELECT DISTINCT t.album AS album_name, t.year AS album_year, a.artist AS artist_name
 			FROM tracks t
 			JOIN artists a ON a.id = t.artist_id
-			WHERE (a.artist = :artist OR a.artist like '% ' || :artist OR a.artist like :artist || ' %')
+			WHERE (a.artist = :artist OR a.artist like '%& ' || :artist OR a.artist like :artist || ' &%')
 			  AND t.year IS NOT NULL
 			UNION ALL
 			SELECT DISTINCT t.album AS album_name, t.year AS album_year, a.artist AS artist_name
