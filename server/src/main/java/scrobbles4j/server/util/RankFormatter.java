@@ -18,8 +18,8 @@ package scrobbles4j.server.util;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 /**
  * @author Michael J. Simons

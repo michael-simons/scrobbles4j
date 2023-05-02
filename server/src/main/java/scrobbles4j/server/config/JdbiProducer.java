@@ -17,8 +17,9 @@ package scrobbles4j.server.config;
 
 import java.net.URI;
 
-import javax.enterprise.inject.Produces;
-import javax.inject.Singleton;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Singleton;
+
 import javax.sql.DataSource;
 
 import org.jdbi.v3.core.Jdbi;

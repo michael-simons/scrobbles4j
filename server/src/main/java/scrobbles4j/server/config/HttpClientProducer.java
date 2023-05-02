@@ -17,8 +17,8 @@ package scrobbles4j.server.config;
 
 import java.net.http.HttpClient;
 
-import javax.enterprise.inject.Produces;
-import javax.inject.Singleton;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Singleton;
 
 import org.eclipse.microprofile.context.ManagedExecutor;
 
