@@ -62,7 +62,6 @@
 		<quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
 		<quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
 		<quarkus.platform.version>3.0.4.Final</quarkus.platform.version>
-		<slf4j.version>1.7.36</slf4j.version>
 		<sortpom-maven-plugin.version>3.2.1</sortpom-maven-plugin.version>
 		<wiremock.version>2.35.0</wiremock.version>
 	</properties>
@@ -100,16 +99,6 @@
 				<groupId>org.ow2.asm</groupId>
 				<artifactId>asm</artifactId>
 				<version>9.5</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-simple</artifactId>
-				<version>${slf4j.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.assertj</groupId>
