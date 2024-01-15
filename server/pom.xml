@@ -9,7 +9,7 @@
 
 	<artifactId>scrobbles4j.server</artifactId>
 	<properties>
-		<error_prone_annotations.version>2.24.0</error_prone_annotations.version>
+		<error_prone_annotations.version>2.24.1</error_prone_annotations.version>
 		<mariadb-java-client.version>2.7.7</mariadb-java-client.version>
 	</properties>
 
