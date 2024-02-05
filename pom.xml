@@ -39,7 +39,7 @@
 	</modules>
 
 	<properties>
-		<assertj.version>3.25.1</assertj.version>
+		<assertj.version>3.25.3</assertj.version>
 		<byte-buddy.version>1.14.11</byte-buddy.version>
 		<checkstyle.version>10.12.7</checkstyle.version>
 		<jdbi3.version>3.43.0</jdbi3.version>
