@@ -23,3 +23,7 @@ nav ul li {
 nav ul li:not(:last-child)::after {
     content: " | ";
 }
+
+a.play {
+    text-decoration: none;
+}

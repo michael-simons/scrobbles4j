@@ -49,7 +49,7 @@
                         <tr>
                             <th scope="row">{rankFormatter.format(entry.rank)}</th>
                             <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
-                            <td>{entry.name}</td>
+                            <td><a class="play" href="scrobbles4j://localhost?artist={str:urlEncode(entry.artist)}&name={str:urlEncode(entry.name)}">▶️</a> {entry.name}</td>
                             <td>{entry.cnt}</td>
                         </tr>
                         {/for}
@@ -78,7 +78,7 @@
                         <tr>
                             <th scope="row">{rankFormatter.format(entry.rank)}</th>
                             <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
-                            <td>{entry.name}</td>
+                            <td><a class="play" href="scrobbles4j://localhost?artist={str:urlEncode(entry.artist)}&name={str:urlEncode(entry.name)}">▶️</a> {entry.name}</td>
                             <td>{entry.cnt}</td>
                         </tr>
                         {/for}
