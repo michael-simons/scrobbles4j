@@ -2,10 +2,10 @@ use scripting additions
 use framework "Foundation"
 
 on open location (newUrl)
-	my play_tracks(newUrl)
+	my play_track(newUrl)
 end open location
 
-on play_tracks(newUrl)
+on play_track(newUrl)
 	set pos to the offset of "?" in the newUrl
 	set AppleScript's text item delimiters to "&"
 	set arguments to every text item of the text from (pos + 1) to -1 of the newUrl
@@ -24,20 +24,15 @@ on play_tracks(newUrl)
 	
 	tell application "Music"
 		set selectedTracks to every track of library playlist 1 whose artist is artistToPlay and name is trackToPlay
+		set playedTheMost to null
 		repeat with selectedTrack in selectedTracks
-			play selectedTrack
-			delay 10
-			repeat while (database ID of the current track is equal to database ID of the selectedTrack)
-				delay (duration of the selectedTrack) / 100
-				if player state is not playing then
-					return
-				end if
-			end repeat
-			if player state is not playing then
-				return
+			if (playedTheMost is null or played count of the selectedTrack > played count of playedTheMost) then
+				set playedTheMost to selectedTrack
 			end if
 		end repeat
-		stop
+		if (playedTheMost is not null) then
+			play playedTheMost with once
+		end if
 	end tell
 end play_tracks
 
