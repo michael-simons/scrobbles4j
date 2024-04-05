@@ -26,34 +26,23 @@ on handle_url(newUrl)
 		end if
 	end repeat
 	
-	if (queue) then
-		set uniqueIdentifier to current application's NSUUID's UUID()'s UUIDString as text
-		set posixtmpfile to POSIX path of (path to temporary items folder) & uniqueIdentifier
-		try
-			set fhandle to open for access posixtmpfile with write permission
-			set AppleScript's text item delimiters to linefeed
-			write ({artistToPlay, trackToPlay} as text) to fhandle as Çclass utf8È
-			close access fhandle
+	set uniqueIdentifier to current application's NSUUID's UUID()'s UUIDString as text
+	set posixtmpfile to POSIX path of (path to temporary items folder) & uniqueIdentifier
+	try
+		set fhandle to open for access posixtmpfile with write permission
+		set AppleScript's text item delimiters to linefeed
+		write ({artistToPlay, trackToPlay} as text) to fhandle as Çclass utf8È
+		close access fhandle
+		if (queue) then
 			do shell script ("more " & posixtmpfile & " | shortcuts run \"Queue track\"")
-		on error
-			try
-				close access posixtmpfile
-			end try
+		else
+			do shell script ("more " & posixtmpfile & " | shortcuts run \"Push track\"")
+		end if
+	on error
+		try
+			close access posixtmpfile
 		end try
-	else
-		tell application "Music"
-			set selectedTracks to every track of library playlist 1 whose artist is artistToPlay and name is trackToPlay
-			set playedTheMost to null
-			repeat with selectedTrack in selectedTracks
-				if (playedTheMost is null or played count of the selectedTrack > played count of playedTheMost) then
-					set playedTheMost to selectedTrack
-				end if
-			end repeat
-			if (playedTheMost is not null) then
-				play playedTheMost with once
-			end if
-		end tell
-	end if
+	end try
 end handle_url
 
 on decodeText(encodedText)
