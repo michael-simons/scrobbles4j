@@ -45,7 +45,7 @@
                         {#for entry in topTracks}
                         <tr>
                             <th scope="row">{rankFormatter.format(entry.rank)}</th>
-                            <td><a class="play" href="scrobbles4j://localhost?artist={str:urlEncode(entry.artist)}&name={str:urlEncode(entry.name)}">▶️</a> {entry.name}</td>
+                            <td><a class="am" title="play" href="scrobbles4j://localhost?artist={str:urlEncode(entry.artist)}&name={str:urlEncode(entry.name)}">▶️</a> <a class="am" title="queue" href="scrobbles4j://localhost?artist={str:urlEncode(entry.artist)}&name={str:urlEncode(entry.name)}&queue">📋</a> {entry.name}</td>
                             <td>{entry.cnt}</td>
                         </tr>
                         {/for}

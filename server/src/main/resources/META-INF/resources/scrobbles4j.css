@@ -24,6 +24,8 @@ nav ul li:not(:last-child)::after {
     content: " | ";
 }
 
-a.play {
+a.am {
     text-decoration: none;
+    font-size: 0.5em;
+    vertical-align: middle;
 }
