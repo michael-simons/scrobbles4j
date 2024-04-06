@@ -23,7 +23,7 @@
                 {#for playedTrack in lastScrobbles}
                 {#with playedTrack}
                 <li>
-                    <a class="am" title="Play it again, Sam" href="scrobbles4j://localhost?artist={str:urlEncode(track.artist.name)}&name={str:urlEncode(track.name)}">🔁️</a>
+                    <a class="am" title="Play it again, Sam" href="{sc:pushTrack(track.artist.name, track.name)}">🔁️</a>
                     <span class="track">"{track.name}"</span> by <span class="artist"><a href="/charts/artist?q={str:urlEncode(track.artist.name)}">{track.artist.name}</a></span> from
                     the album <span class="album">"{track.album}"</span>
                     at <span class="played-on">{playedOn.format('dd/MM/yyyy, HH:mm', locale, zone)}</span>

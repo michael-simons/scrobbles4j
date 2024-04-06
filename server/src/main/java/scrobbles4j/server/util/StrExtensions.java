@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 michael-simons.eu.
+ * Copyright 2021-2024 michael-simons.eu.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 public final class StrExtensions {
 
 	static String urlEncode(String s) {
-		return URLEncoder.encode(s, StandardCharsets.UTF_8);
+		return URLEncoder.encode(s, StandardCharsets.UTF_8).replace("+", "%20");
 	}
 
 	private StrExtensions() {

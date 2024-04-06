@@ -49,7 +49,7 @@
                         <tr>
                             <th scope="row">{rankFormatter.format(entry.rank)}</th>
                             <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
-                            <td><a class="am" title="play" href="scrobbles4j://localhost?artist={str:urlEncode(entry.artist)}&name={str:urlEncode(entry.name)}">▶️</a> <a class="am" title="queue" href="scrobbles4j://localhost?artist={str:urlEncode(entry.artist)}&name={str:urlEncode(entry.name)}&queue">📋</a> {entry.name}</td>
+                            <td><a class="am" title="play" href="{sc:pushTrack(entry.artist, entry.name)}">▶️</a> <a class="am" title="queue" href="{sc:queueTrack(entry.artist, entry.name)}">📋</a> {entry.name}</td>
                             <td>{entry.cnt}</td>
                         </tr>
                         {/for}
@@ -58,7 +58,6 @@
                 </table>
                 {/if}
             </section>
-
 
             {#if !topNewTracks.empty}
             <section>
@@ -78,7 +77,7 @@
                         <tr>
                             <th scope="row">{rankFormatter.format(entry.rank)}</th>
                             <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
-                            <td><a class="am" title="play" href="scrobbles4j://localhost?artist={str:urlEncode(entry.artist)}&name={str:urlEncode(entry.name)}">▶️</a> <a class="am" title="queue" href="scrobbles4j://localhost?artist={str:urlEncode(entry.artist)}&name={str:urlEncode(entry.name)}&queue">📋</a> {entry.name}</td>
+                            <td><a class="am" title="play" href="{sc:pushTrack(entry.artist, entry.name)}">▶️</a> <a class="am" title="queue" href="{sc:queueTrack(entry.artist, entry.name)}">📋</a> {entry.name}</td>
                             <td>{entry.cnt}</td>
                         </tr>
                         {/for}
@@ -105,7 +104,7 @@
                         <tr>
                             <th scope="row">{rankFormatter.format(entry.rank)}</th>
                             <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
-                            <td><a class="am" title="play" href="scrobbles4j://localhost?artist={str:urlEncode(entry.artist)}&album={str:urlEncode(entry.name)}">▶️</a> {entry.name}</td>
+                            <td><a class="am" title="play" href="{sc:pushAlbum(entry.artist, entry.name)}">▶️</a> {entry.name}</td>
                         </tr>
                         {/for}
                         {/let}
