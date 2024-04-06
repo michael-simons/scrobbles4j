@@ -105,7 +105,7 @@
                         <tr>
                             <th scope="row">{rankFormatter.format(entry.rank)}</th>
                             <td><a href="/charts/artist?q={str:urlEncode(entry.artist)}">{entry.artist}</a></td>
-                            <td>{entry.name}</td>
+                            <td><a class="am" title="play" href="scrobbles4j://localhost?artist={str:urlEncode(entry.artist)}&album={str:urlEncode(entry.name)}">▶️</a> {entry.name}</td>
                         </tr>
                         {/for}
                         {/let}
