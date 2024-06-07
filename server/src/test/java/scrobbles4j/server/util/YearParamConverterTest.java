@@ -18,6 +18,7 @@ package scrobbles4j.server.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Year;
+import java.time.temporal.Temporal;
 
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +47,7 @@ class YearParamConverterTest {
 	void shouldDealWithNullString() {
 
 		var converter = provider.getConverter(Year.class, null, null);
-		assertThat(converter.fromString(null)).isNull();
+		assertThat((Temporal) converter.fromString(null)).isNull();
 	}
 
 	@Test
@@ -60,7 +61,7 @@ class YearParamConverterTest {
 	void shouldConvertStrings() {
 
 		var converter = provider.getConverter(Year.class, null, null);
-		assertThat(converter.fromString("2021")).isEqualTo(Year.of(2021));
+		assertThat((Temporal) converter.fromString("2021")).isEqualTo(Year.of(2021));
 	}
 
 	@Test
