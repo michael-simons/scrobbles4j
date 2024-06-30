@@ -106,7 +106,8 @@ public class ChartResource {
 			.data("topTracks", this.chartService.getTopNTracks(10, Optional.empty(), Optional.empty(), includeCompilations))
 			.data("topAlbums", this.chartService.getTopNAlbums(10, Optional.empty()))
 			.data("numArtists", numArtists)
-			.data("favoriteArtists", this.chartService.getFavoriteArtistsByYears(numArtists, 10));
+			.data("topArtistsByYear", this.chartService.getTopNArtistsByYear(numArtists, 10))
+			.data("topArtists", this.chartService.getTopNArtists(numArtists));
 	}
 
 	/**

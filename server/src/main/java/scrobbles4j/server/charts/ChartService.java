@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -64,7 +63,7 @@ final class ChartService {
 			FROM tracks t JOIN plays p ON t.id = p.track_id
 			LEFT OUTER JOIN prev ON prev.cnt <> 0
 			LEFT OUTER JOIN next ON next.cnt <> 0
-			WHERE year(p.played_on) = :year;
+			WHERE year(p.played_on) = :year
 			""";
 
 		return this.db.withHandle(handle -> handle.createQuery(statement)
@@ -78,7 +77,13 @@ final class ChartService {
 			)).one());
 	}
 
-	Map<Integer, List<EntryArtist>> getFavoriteArtistsByYears(int maxRank, int numYears) {
+	/**
+	 * Gets the topn n artists by year.
+	 * @param maxRank the maximum entries
+	 * @param numYears the maximum number of years
+	 * @return The top n artists by year
+	 */
+	Map<Integer, List<EntryArtist>> getTopNArtistsByYear(int maxRank, int numYears) {
 
 		var statement = """
 			WITH rank_per_year AS (
@@ -161,7 +166,7 @@ final class ChartService {
 				.bind("compilation", includeCompilations ? "f" : null)
 				.map((rs, ctx) -> new EntryTrack(rs.getInt("rank"), rs.getInt("cnt"), rs.getString("artist"),
 					rs.getString("name")))
-				.collect(Collectors.toList());
+				.collectIntoList();
 		});
 	}
 
@@ -200,7 +205,7 @@ final class ChartService {
 			.bind("maxRank", maxRank)
 			.map((rs, ctx) -> new EntryTrack(rs.getInt("rank"), rs.getInt("cnt"), rs.getString("artist"),
 				rs.getString("name")))
-			.collect(Collectors.toList()));
+			.collectIntoList());
 	}
 
 	/**
@@ -223,7 +228,7 @@ final class ChartService {
 			  GROUP BY a.artist, t.album
 			) src
 			WHERE rank <= :maxRank
-			ORDER BY rank ASC;
+			ORDER BY rank ASC
 			""";
 
 		return this.db.withHandle(handle -> {
@@ -233,14 +238,14 @@ final class ChartService {
 			return query
 				.bind("maxRank", maxRank)
 				.map((rs, ctx) -> new EntryAlbum(rs.getInt("rank"), rs.getString("artist"), rs.getString("album")))
-				.collect(Collectors.toList());
+				.collectIntoList();
 		});
 	}
 
 	/**
 	 * @param maxRank The maximum rank to be included
 	 * @param year    The year in which the entries had been play
-	 * @return A list of chart entries for albums
+	 * @return A list of chart entries for artists
 	 */
 	Collection<EntryArtist> getTopNArtists(int maxRank, Year year) {
 
@@ -276,6 +281,32 @@ final class ChartService {
 			.bind("maxRank", maxRank)
 			.bind("year", year.getValue())
 			.map((rs, ctx) -> new EntryArtist(rs.getInt("rank"), rs.getString("artist"), rs.getString("change")))
-			.collect(Collectors.toList()));
+			.collectIntoList());
+	}
+
+	/**
+	 * @param maxRank The maximum rank to be included
+	 * @return A list of chart entries for artists
+	 */
+	Collection<EntryArtist> getTopNArtists(int maxRank) {
+
+		var statement = """
+			SELECT * FROM (
+			  SELECT dense_rank() OVER (ORDER BY count(*) DESC) AS rank,
+			         a.artist
+			  FROM plays p
+			  JOIN tracks t ON t.id = p.track_id
+			  JOIN artists a ON a.id = t.artist_id
+			  WHERE t.compilation = 'f'
+			  GROUP BY a.artist
+			) src
+			WHERE rank <= :maxRank
+			ORDER BY rank ASC
+			""";
+
+		return this.db.withHandle(handle -> handle.createQuery(statement)
+			.bind("maxRank", maxRank)
+			.map((rs, ctx) -> new EntryArtist(rs.getInt("rank"), rs.getString("artist"), null))
+			.collectIntoList());
 	}
 }

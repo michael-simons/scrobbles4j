@@ -75,9 +75,33 @@
             </section>
             {/if}
 
-            {#if !favoriteArtists.empty}
+            {#if !topArtists.empty}
             <section>
-                <h2 id="top-artists">Favorite artists per year in the last decade<sup>2, 3</sup></h2>
+                <h2 id="top-albums">Top {numArtists} Artists overall<sup>2</sup></h2>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Rank</th>
+                        <th scope="col">Artist</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {#let rankFormatter=inject:rankFormatter.get()}
+                        {#for entry in topArtists}
+                            <tr>
+                            <th scope="row">{rankFormatter.format(entry.rank)}</th>
+                            <td><a href="/charts/artist?q={str:urlEncode(entry.name)}">{entry.name}</a></td>
+                            </tr>
+                        {/for}
+                    {/let}
+                    </tbody>
+                </table>
+            </section>
+            {/if}
+
+            {#if !topArtistsByYear.empty}
+            <section>
+                <h2 id="top-artists">Top {numArtists} artists per year in the last decade<sup>2, 3</sup></h2>
                 <table class="table">
                     <thead>
                         <tr>
@@ -86,7 +110,7 @@
                             <th scope="col">Change</th>
                         </tr>
                     </thead>
-                    {#for year in favoriteArtists}
+                    {#for year in topArtistsByYear}
                     <tbody class="one-of-many">
                         <tr>
                             <th colspan="3"><a href="/charts/{year.key}">{year.key}</a></th>
