@@ -57,7 +57,7 @@
 
 	<properties>
 		<assertj.version>3.26.3</assertj.version>
-		<byte-buddy.version>1.15.3</byte-buddy.version>
+		<byte-buddy.version>1.15.8</byte-buddy.version>
 		<checkstyle.version>10.19.0</checkstyle.version>
 		<jdbi3.version>3.47.0</jdbi3.version>
 		<junit-jupiter.version>5.11.3</junit-jupiter.version>
