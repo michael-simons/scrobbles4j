@@ -58,7 +58,7 @@
 	<properties>
 		<assertj.version>3.27.3</assertj.version>
 		<byte-buddy.version>1.17.1</byte-buddy.version>
-		<checkstyle.version>10.21.2</checkstyle.version>
+		<checkstyle.version>10.21.3</checkstyle.version>
 		<jdbi3.version>3.48.0</jdbi3.version>
 		<junit-jupiter.version>5.11.4</junit-jupiter.version>
 		<license-maven-plugin.version>4.6</license-maven-plugin.version>
