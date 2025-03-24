@@ -61,7 +61,7 @@
 		<checkstyle.version>10.21.4</checkstyle.version>
 		<jdbi3.version>3.48.0</jdbi3.version>
 		<junit-jupiter.version>5.12.1</junit-jupiter.version>
-		<license-maven-plugin.version>4.6</license-maven-plugin.version>
+		<license-maven-plugin.version>5.0.0</license-maven-plugin.version>
 		<maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
 		<maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
