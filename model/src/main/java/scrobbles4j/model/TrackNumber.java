@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 package scrobbles4j.model;
 
 /**
- * Representation of a track number (usually a pair of the actual track number and the total number of tracks on an album.
+ * Representation of a track number (usually a pair of the actual track number and the
+ * total number of tracks on an album.
  *
  * @author Michael J. Simons
  * @param value the actual track number

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 package scrobbles4j.server.charts;
 
 /**
+ * A chart entry of type album.
+ *
  * @author Michael J. Simons
- * @param rank   rank of that entry
+ * @param rank rank of that entry
  * @param artist the artist of the album
- * @param name   the ranked album
+ * @param name the ranked album
  */
 public record EntryAlbum(int rank, String artist, String name) {
 }

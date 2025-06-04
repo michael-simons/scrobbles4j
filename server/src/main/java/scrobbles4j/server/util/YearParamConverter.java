@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,33 @@ import jakarta.ws.rs.ext.ParamConverterProvider;
 import jakarta.ws.rs.ext.Provider;
 
 /**
+ * Allows using {@link Year} objects as parameters in resources.
+ *
  * @author Michael J. Simons
  */
 public final class YearParamConverter implements ParamConverter<Year> {
+
+	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+
+	private YearParamConverter() {
+	}
+
+	@Override
+	public Year fromString(String value) {
+		if (value == null) {
+			return null;
+		}
+
+		return this.formatter.parse(value, Year::from);
+	}
+
+	@Override
+	public String toString(Year value) {
+		if (value == null) {
+			return null;
+		}
+		return this.formatter.format(value);
+	}
 
 	/**
 	 * Provider for the {@link YearParamConverter}. Always returns the same instance.
@@ -42,31 +66,11 @@ public final class YearParamConverter implements ParamConverter<Year> {
 		public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
 
 			if (rawType.equals(Year.class)) {
-				return (ParamConverter<T>) instance;
+				return (ParamConverter<T>) this.instance;
 			}
 			return null;
 		}
+
 	}
 
-	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
-
-	private YearParamConverter() {
-	}
-
-	@Override
-	public Year fromString(String value) {
-		if (value == null) {
-			return null;
-		}
-
-		return formatter.parse(value, Year::from);
-	}
-
-	@Override
-	public String toString(Year value) {
-		if (value == null) {
-			return null;
-		}
-		return formatter.format(value);
-	}
 }

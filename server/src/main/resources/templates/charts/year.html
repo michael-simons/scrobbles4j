@@ -33,7 +33,7 @@
                         <a href="?includeCompilations=true">Include tracks from compilations</a>
                     {/if}
                 </p>
-                {#if !topTracks.empty}
+                {#if topTracks}
                 <table class="table">
                     <thead>
                         <tr>
@@ -59,7 +59,7 @@
                 {/if}
             </section>
 
-            {#if !topNewTracks.empty}
+            {#if topNewTracks}
             <section>
                 <h2 id="top-new-tracks">Top 5 new Tracks in {year}<sup>2, 3</sup></h2>
                 <table class="table">
@@ -87,7 +87,7 @@
             </section>
             {/if}
 
-            {#if !topAlbums.empty}
+            {#if topAlbums}
             <section>
                 <h2 id="top-albums">Top 10 Albums in {year}<sup>2</sup></h2>
                 <table class="table">
@@ -113,7 +113,7 @@
             </section>
             {/if}
 
-            {#if !topArtists.empty}
+            {#if topArtists}
             <section>
                 <h2 id="top-artists">Top 10 Artists in {year}<sup>2</sup></h2>
                 <table class="table">
@@ -144,6 +144,19 @@
                 <sup>2</sup>Compilations are excluded.<br />
                 <sup>3</sup>Those are tracks that have been released and played the first time in {year}.
             </p>
+
+            {#if !scrobbleStats.empty}
+            <p>
+                Monthly stats are here:
+            </p>
+            <ul>
+                {#for month in months}
+                    <li>
+                        <a href="/charts/{month.year}/{month.monthValue}">{month.format('MMMM', locale)}</a>
+                    </li>
+                {/for}
+            </ul>
+            {/if}
         </main>
         <footer>
             <p>

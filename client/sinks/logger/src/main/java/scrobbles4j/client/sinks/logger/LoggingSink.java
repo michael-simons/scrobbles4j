@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,21 @@
  */
 package scrobbles4j.client.sinks.logger;
 
+import java.util.Collection;
+import java.util.logging.Logger;
+
 import scrobbles4j.client.sinks.api.PlayingTrackEvent;
 import scrobbles4j.client.sinks.api.Sink;
 import scrobbles4j.model.PlayedTrack;
 
-import java.util.Collection;
-import java.util.logging.Logger;
-
 /**
+ * A sink that delegates to jul.
+ *
  * @author Michael J. Simons
  */
 public final class LoggingSink implements Sink {
 
-	private final Logger targetLog = Logger.getLogger(LoggingSink.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(LoggingSink.class.getName());
 
 	@Override
 	public boolean isActiveByDefault() {
@@ -37,15 +39,16 @@ public final class LoggingSink implements Sink {
 	@Override
 	public void onTrackPlaying(PlayingTrackEvent event) {
 
-		targetLog.info("Playing track " + event.track() + " at position " + event.position() + (event.seenBefore() ?
-			"" :
-			" (changed since last event)"));
+		LOGGER.info("Playing track " + event.track() + " at position " + event.position()
+				+ (event.seenBefore() ? "" : " (changed since last event)"));
 	}
 
 	@Override
 	public void consumeAll(Collection<PlayedTrack> playedTracks) {
 
-		targetLog.info("Received the following tracks");
-		playedTracks.forEach(playedTrack -> targetLog.info(() -> String.format("%s played on %s", playedTrack.track(), playedTrack.playedOn())));
+		LOGGER.info("Received the following tracks");
+		playedTracks.forEach(playedTrack -> LOGGER
+			.info(() -> String.format("%s played on %s", playedTrack.track(), playedTrack.playedOn())));
 	}
+
 }

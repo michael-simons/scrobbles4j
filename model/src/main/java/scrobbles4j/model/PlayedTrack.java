@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.time.Instant;
  * A played track.
  *
  * @author Michael J. Simons
- * @param track    the source track
+ * @param track the source track
  * @param playedOn the moment the track was play on
  */
 public record PlayedTrack(Track track, Instant playedOn) {

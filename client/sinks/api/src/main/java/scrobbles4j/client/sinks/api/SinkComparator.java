@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package scrobbles4j.client.sinks.api;
 import java.util.Comparator;
 
 /**
- * A comparator for {@link Sink sinks}, comparing them by their {@link Sink#getOrder()}, in which higher values mean
- * precedence.
+ * A comparator for {@link Sink sinks}, comparing them by their {@link Sink#getOrder()},
+ * in which higher values mean precedence.
  *
  * @author Michael J. Simons
  */
@@ -34,4 +34,5 @@ public enum SinkComparator implements Comparator<Sink> {
 	public int compare(Sink o1, Sink o2) {
 		return -Integer.compare(o1.getOrder(), o2.getOrder());
 	}
+
 }

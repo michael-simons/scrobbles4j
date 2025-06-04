@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 package scrobbles4j.client.sources.api;
 
-import scrobbles4j.model.PlayedTrack;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
+import scrobbles4j.model.PlayedTrack;
 
 /**
  * Provides access to the tracks of the implementing source.
@@ -43,7 +43,8 @@ public interface Source {
 	}
 
 	/**
-	 * {@return the current playing track} If the latest track cannot be determined the method should return an empty {@link Optional}.
+	 * {@return the current playing track} If the latest track cannot be determined the
+	 * method should return an empty {@link Optional}.
 	 */
 	Optional<PlayingTrack> getCurrentTrack();
 
@@ -53,4 +54,5 @@ public interface Source {
 	default Collection<PlayedTrack> getSelectedTracks() {
 		return List.of();
 	}
+
 }

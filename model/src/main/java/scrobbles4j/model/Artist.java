@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@ import java.net.URI;
  * Representation of an artist.
  *
  * @author Michael J. Simons
- * @param name Name of the artist
- * @param wikipediaLink An optional link to the artists wikipedia page.
+ * @param name name of the artist
+ * @param wikipediaLink an optional link to the artists wikipedia page.
  */
 public record Artist(String name, URI wikipediaLink) {
 
 	/**
-	 * Creates an artist without a link to the wikipedia
-	 * @param name Name of the artist
+	 * Creates an artist without a link to the wikipedia.
+	 * @param name name of the artist
 	 */
 	public Artist(String name) {
 		this(name, null);

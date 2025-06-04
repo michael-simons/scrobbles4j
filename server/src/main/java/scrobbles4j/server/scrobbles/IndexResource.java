@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 package scrobbles4j.server.scrobbles;
 
-import io.quarkus.qute.Location;
-import io.quarkus.qute.Template;
-import io.quarkus.qute.TemplateInstance;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 
+import io.quarkus.qute.Location;
+import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -32,6 +31,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 
 /**
+ * Landing page.
+ *
  * @author Michael J. Simons
  */
 @Path("/")
@@ -44,8 +45,9 @@ public class IndexResource {
 	private final Template index;
 
 	/**
-	 * @param scrobbleService Needed to access scrobbles
-	 * @param index           Template for the main view
+	 * Main entry.
+	 * @param scrobbleService needed to access scrobbles
+	 * @param index template for the main view
 	 */
 	@Inject
 	public IndexResource(ScrobbleService scrobbleService, @Location("scrobbles/index") Template index) {
@@ -55,21 +57,20 @@ public class IndexResource {
 	}
 
 	/**
-	 * An overview about the recently played tracks
-	 *
-	 * @param uriInfo Needed to derive links
-	 * @return A template instance
+	 * An overview about the recently played tracks.
+	 * @param uriInfo needed to derive links
+	 * @return a template instance
 	 */
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance index(@Context UriInfo uriInfo) {
 
-		var cutOffDate = ZonedDateTime.now(zoneId).minusMonths(1).toInstant();
-		return index
-			.data("zone", zoneId)
-			.data("locale", Locale.UK)
-			.data("years", scrobbleService.getAvailableYears())
-			.data("lastScrobbles", scrobbleService.getLatest(20, cutOffDate))
-			.data("scrobbleStats", scrobbleService.getScrobbleStats());
+		var cutOffDate = ZonedDateTime.now(this.zoneId).minusMonths(1).toInstant();
+		return this.index.data("zone", this.zoneId)
+			.data("locale", Locale.ENGLISH)
+			.data("years", this.scrobbleService.getAvailableYears())
+			.data("lastScrobbles", this.scrobbleService.getLatest(20, cutOffDate))
+			.data("scrobbleStats", this.scrobbleService.getScrobbleStats());
 	}
+
 }

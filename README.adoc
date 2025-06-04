@@ -62,14 +62,14 @@ This will bring up MariaDB inside a container:
 
 [source,bash]
 ----
-./mvnw quarkus:dev
+./mvnw -Dlicense.skip quarkus:dev
 ----
 
 To point it to your own instance run:
 
 [source,bash]
 ----
-./mvnw quarkus:dev \
+./mvnw -Dlicense.skip quarkus:dev \
   -Dquarkus.datasource.jdbc.url=jdbc:mariadb://127.0.0.1:3306/music\?useJDBCCompliantTimezoneShift=true\&useUnicode=true\&serverTimezone=UTC\&useGmtMillisForDatetimes=true\&useLegacyDatetimeCode=false\&useTimezone=true \
   -Dquarkus.datasource.username=root \
   -Dquarkus.datasource.password=secret
@@ -80,7 +80,7 @@ One live instance is here: http://charts.michael-simons.eu.
 NOTE: As the scrobbler backend is not yet implemented, the live data behind the instance
       above comes straight from my old scrobbler at https://dailyfratze.de.
       As a matter of fact, Scrobbles4j owns a separate scheme in the database, with
-      read only access and a couple of views onto the original source. 
+      read only access and a couple of views onto the original source.
       CQRS on the database level. Thanks https://twitter.com/jordisola_/status/1444225890800525316[ᴊᴏʀᴅɪ]
       for a fitting description.
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import scrobbles4j.model.Track;
  * Represents a playing track.
  *
  * @author Michael J. Simons
- * @param track            The track that is actual playing
- * @param position         The current position.
+ * @param track The track that is actual playing
+ * @param position The current position.
  */
 public record PlayingTrack(Track track, double position) {
 }

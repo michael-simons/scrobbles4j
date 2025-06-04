@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,44 +15,23 @@
  */
 package scrobbles4j.client.app;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
-
 import scrobbles4j.client.sinks.api.PlayingTrackEvent;
 import scrobbles4j.client.sinks.api.Sink;
 import scrobbles4j.client.sources.api.PlayingTrack;
 import scrobbles4j.client.sources.api.Source;
 import scrobbles4j.client.sources.api.State;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author Michael J. Simons
  */
-class LauncherTest {
-
-	static class ASource implements Source {
-
-		@Override
-		public Optional<PlayingTrack> getCurrentTrack() {
-			return Optional.empty();
-		}
-
-		@Override
-		public State getCurrentState() {
-			return State.PLAYING;
-		}
-	}
-
-	static class ASink implements Sink {
-
-		@Override
-		public void onTrackPlaying(PlayingTrackEvent event) {
-		}
-	}
+class LauncherTests {
 
 	@Test
 	void includedSourcesShouldWork() {
@@ -73,7 +52,29 @@ class LauncherTest {
 
 		var config = Map.of("asink.a", "a", "aSink.b", "b", "nothing", "x", "unrelated.y", "y", "ASink.c", "c");
 		var finalConfig = Launcher.extractConfigFor(new ASink(), config);
-		assertThat(finalConfig)
-			.containsAllEntriesOf(Map.of("a", "a", "b", "b", "c", "c"));
+		assertThat(finalConfig).containsAllEntriesOf(Map.of("a", "a", "b", "b", "c", "c"));
 	}
+
+	static class ASource implements Source {
+
+		@Override
+		public Optional<PlayingTrack> getCurrentTrack() {
+			return Optional.empty();
+		}
+
+		@Override
+		public State getCurrentState() {
+			return State.PLAYING;
+		}
+
+	}
+
+	static class ASink implements Sink {
+
+		@Override
+		public void onTrackPlaying(PlayingTrackEvent event) {
+		}
+
+	}
+
 }

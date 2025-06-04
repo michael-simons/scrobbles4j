@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package scrobbles4j.server.scrobbles;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -26,27 +24,25 @@ import java.time.format.DateTimeFormatter;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
-
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @QuarkusTest
 @TestHTTPEndpoint(IndexResource.class)
-class IndexResourceTest {
+class IndexResourceTests {
 
 	@Test
 	void indexShouldWork() {
-		var response = RestAssured.when().get()
-			.then().statusCode(200)
-			.extract().htmlPath();
+		var response = RestAssured.when().get().then().statusCode(200).extract().htmlPath();
 
-		var title = response
-			.getString("html.body.main.ol.li[0].span[0]");
+		var title = response.getString("html.body.main.ol.li[0].span[0]");
 		assertThat(title).isEqualTo("\"Only For The Weak\"");
-		var playedOn = response
-			.getString("html.body.main.ol.li[0].span[3]");
+		var playedOn = response.getString("html.body.main.ol.li[0].span[3]");
 
 		var time = LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC).plus(Duration.ofMinutes(123));
 		var formatter = DateTimeFormatter.ofPattern("HH:mm");
 		assertThat(playedOn).endsWith(formatter.format(time.atZone(ZoneId.systemDefault())));
 	}
+
 }

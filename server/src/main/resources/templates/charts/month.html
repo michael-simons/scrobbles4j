@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Charts | {current}</title>
+        <link rel="stylesheet" href="/scrobbles4j.css">
+    </head>
+    <body>
+        <nav>
+            <ul>
+                <li><a href="/">Start</a></li>
+                <li><a href="/charts">Charts</a></li>
+                <li><a href="/charts/{current.year}">{current.year}</a></li>
+                <li>
+                    <a href="/charts/{previous.year}/{previous.monthValue}">«</a>&nbsp;{current.format('MMMM', locale)}&nbsp;<a href="/charts/{next.year}/{next.monthValue}">»</a>
+                </li>
+            </ul>
+        </nav>
+
+        <main>
+            {#if artists}
+            <section>
+                <h2>Top {artists.size} artists</h2>
+                <div class="image-box">
+                    {#for artist in artists}
+                    <div class="artist-image">
+                        <h3>{artist.rank}: <a href="/charts/artist?q={str:urlEncode(artist.value.name)}">{artist.value.name}</a></h3>
+                        Played {artist.cnt} times.
+                        {#if artist.value.image}
+                        {#let image = artist.value.image.get}
+                        <br>
+                        <img src="{image.src}" alt="Image of {artist.value.name}, from Wikimedia Commons">
+                        <br>
+                        Source: <a href="{image.wikipediaLink}">{image.wikipediaLink}</a>
+                        {/if}
+                    </div>
+                    {/for}
+                </div>
+            </section>
+            {/if}
+
+            {#if tracks}
+            <section>
+                <h2>Top tracks</h2>
+                <ul>
+                    {#for track in tracks}
+                        <li><span class="track">"{track.name}"</span> by <span class="artist"><a href="/charts/artist?q={str:urlEncode(track.artist)}">{track.artist}</a></span></li>
+                    {/for}
+                </ul>
+            </section>
+            {/if}
+
+            {#if albums}
+            <section>
+                <h2 id="top-artists">Top {albums.size} albums</h2>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Rank</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Times played</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {#let rankFormatter=inject:rankFormatter.get()}
+                        {#for entry in albums}
+                            <tr>
+                                <th scope="row">{rankFormatter.format(entry.rank)}</th>
+                                <td>{entry.value.name}</td>
+                                <td>{entry.cnt}</td>
+                            </tr>
+                        {/for}
+                    {/let}
+                    </tbody>
+                </table>
+            </section>
+            {/if}
+        </main>
+        <footer>
+            <p>
+                Powered by <a href="https://github.com/michael-simons/scrobbles4j">Scrobbles4j</a>
+            </p>
+        </footer>
+    </body>
+</html>

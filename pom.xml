@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2021-2024 the original author or authors.
+    Copyright 2021-2025 the original author or authors.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -60,12 +60,12 @@
 		<byte-buddy.version>1.17.5</byte-buddy.version>
 		<checkstyle.version>10.25.0</checkstyle.version>
 		<jdbi3.version>3.49.4</jdbi3.version>
-		<junit-jupiter.version>5.12.2</junit-jupiter.version>
+		<junit-jupiter.version>5.13.0</junit-jupiter.version>
 		<license-maven-plugin.version>5.0.0</license-maven-plugin.version>
 		<maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
 		<maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
-		<maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
+		<maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
 		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
 		<maven-jlink-plugin.version>3.2.0</maven-jlink-plugin.version>
@@ -79,8 +79,9 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
 		<quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-		<quarkus.platform.version>3.22.3</quarkus.platform.version>
+		<quarkus.platform.version>3.23.0</quarkus.platform.version>
 		<sortpom-maven-plugin.version>4.0.0</sortpom-maven-plugin.version>
+		<spring-javaformat.version>0.0.46</spring-javaformat.version>
 		<wiremock.version>2.35.2</wiremock.version>
 	</properties>
 
@@ -157,7 +158,7 @@
 							<factories>SCRIPT_STYLE</factories>
 						</mapping>
 						<properties>
-							<year>2024</year>
+							<year>2025</year>
 						</properties>
 						<licenseSets>
 							<licenseSet>
@@ -175,29 +176,72 @@
 									<exclude>**/*.tpl</exclude>
 									<exclude>**/*.txt</exclude>
 									<exclude>**/*.yaml</exclude>
-									<exclude>**/package-info.java</exclude>
 								</excludes>
 							</licenseSet>
 						</licenseSets>
 						<dependencyEnforce>true</dependencyEnforce>
 						<dependencyExceptionMessage>One or more dependencies are licensed under a non-approved license.</dependencyExceptionMessage>
-
+						<dependencyPolicies>
+							<dependencyPolicy>
+								<type>LICENSE_URL</type>
+								<rule>APPROVE</rule>
+								<value>https://www.apache.org/licenses/LICENSE-2.0</value>
+							</dependencyPolicy>
+							<dependencyPolicy>
+								<type>LICENSE_NAME</type>
+								<rule>APPROVE</rule>
+								<value>Apache License, Version 2</value>
+							</dependencyPolicy>
+							<dependencyPolicy>
+								<type>LICENSE_NAME</type>
+								<rule>APPROVE</rule>
+								<value>Apache License, Version 2.0</value>
+							</dependencyPolicy>
+							<dependencyPolicy>
+								<type>LICENSE_NAME</type>
+								<rule>APPROVE</rule>
+								<value>The Apache Software License, Version 2.0</value>
+							</dependencyPolicy>
+							<dependencyPolicy>
+								<type>LICENSE_NAME</type>
+								<rule>APPROVE</rule>
+								<value>The Apache Software License, version 2.0</value>
+							</dependencyPolicy>
+							<dependencyPolicy>
+								<type>LICENSE_NAME</type>
+								<rule>APPROVE</rule>
+								<value>Apache-2.0</value>
+							</dependencyPolicy>
+							<dependencyPolicy>
+								<type>LICENSE_NAME</type>
+								<rule>APPROVE</rule>
+								<value>Apache License 2.0</value>
+							</dependencyPolicy>
+							<dependencyPolicy>
+								<type>LICENSE_NAME</type>
+								<rule>APPROVE</rule>
+								<value>Apache 2</value>
+							</dependencyPolicy>
+							<dependencyPolicy>
+								<type>LICENSE_NAME</type>
+								<rule>APPROVE</rule>
+								<value>LGPL</value>
+							</dependencyPolicy>
+						</dependencyPolicies>
 					</configuration>
-					<executions>
-						<execution>
-							<id>validate</id>
-							<goals>
-								<goal>check</goal>
-							</goals>
-							<phase>validate</phase>
-						</execution>
-					</executions>
+				</plugin>
+				<plugin>
+					<groupId>io.spring.javaformat</groupId>
+					<artifactId>spring-javaformat-maven-plugin</artifactId>
+					<version>${spring-javaformat.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
 					<version>${maven-checkstyle-plugin.version}</version>
 					<configuration>
+						<excludes>**/module-info.java</excludes>
+						<includeTestSourceDirectory>true</includeTestSourceDirectory>
 						<configLocation>etc/checkstyle/config.xml</configLocation>
 						<suppressionsLocation>etc/checkstyle/suppressions.xml</suppressionsLocation>
 						<inputEncoding>${project.build.sourceEncoding}</inputEncoding>
@@ -211,9 +255,31 @@
 							<artifactId>checkstyle</artifactId>
 							<version>${checkstyle.version}</version>
 						</dependency>
+						<dependency>
+							<groupId>io.spring.javaformat</groupId>
+							<artifactId>spring-javaformat-checkstyle</artifactId>
+							<version>${spring-javaformat.version}</version>
+						</dependency>
 					</dependencies>
 				</plugin>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>${maven-enforcer-plugin.version}</version>
+					<configuration>
+						<rules>
+							<DependencyConvergence />
+							<requireMavenVersion>
+								<version>${maven.version}</version>
+							</requireMavenVersion>
+							<requireJavaVersion>
+								<version>${maven.compiler.release}</version>
+							</requireJavaVersion>
+						</rules>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
 					<version>${maven-dependency-plugin.version}</version>
 					<executions>
@@ -238,22 +304,22 @@
 					</executions>
 				</plugin>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jlink-plugin</artifactId>
 					<version>${maven-jlink-plugin.version}</version>
 				</plugin>
 				<plugin>
-					<artifactId>maven-enforcer-plugin</artifactId>
-					<version>${maven-enforcer-plugin.version}</version>
-				</plugin>
-				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>${maven-javadoc-plugin.version}</version>
 				</plugin>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>${maven-jar-plugin.version}</version>
 				</plugin>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler-plugin.version}</version>
 				</plugin>
@@ -261,6 +327,19 @@
 					<groupId>com.github.ekryd.sortpom</groupId>
 					<artifactId>sortpom-maven-plugin</artifactId>
 					<version>${sortpom-maven-plugin.version}</version>
+					<configuration>
+						<encoding>${project.build.sourceEncoding}</encoding>
+						<keepBlankLines>true</keepBlankLines>
+						<nrOfIndentSpace>-1</nrOfIndentSpace>
+						<sortProperties>true</sortProperties>
+						<sortDependencies>scope,groupId,artifactId</sortDependencies>
+						<createBackupFile>false</createBackupFile>
+						<expandEmptyElements>false</expandEmptyElements>
+						<verifyFail>stop</verifyFail>
+						<verifyFailOn>strict</verifyFailOn>
+						<spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
+						<pomFile>pom.xml</pomFile>
+					</configuration>
 				</plugin>
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
@@ -289,6 +368,44 @@
 
 		<plugins>
 			<plugin>
+				<groupId>com.github.ekryd.sortpom</groupId>
+				<artifactId>sortpom-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+						<phase>validate</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<phase>validate</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>io.spring.javaformat</groupId>
+				<artifactId>spring-javaformat-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>validate</goal>
+						</goals>
+						<phase>validate</phase>
+						<inherited>true</inherited>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<executions>
@@ -302,6 +419,7 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
 				<executions>
 					<execution>
@@ -310,42 +428,10 @@
 							<goal>enforce</goal>
 						</goals>
 						<phase>validate</phase>
-						<configuration>
-							<rules>
-								<DependencyConvergence/>
-								<requireMavenVersion>
-									<version>${maven.version}</version>
-								</requireMavenVersion>
-								<requireJavaVersion>
-									<version>${maven.compiler.release}</version>
-								</requireJavaVersion>
-							</rules>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>com.github.ekryd.sortpom</groupId>
-				<artifactId>sortpom-maven-plugin</artifactId>
-				<configuration>
-					<encoding>${project.build.sourceEncoding}</encoding>
-					<keepBlankLines>true</keepBlankLines>
-					<nrOfIndentSpace>-1</nrOfIndentSpace>
-					<sortProperties>true</sortProperties>
-					<sortDependencies>scope,groupId,artifactId</sortDependencies>
-					<createBackupFile>false</createBackupFile>
-					<expandEmptyElements>false</expandEmptyElements>
-				</configuration>
-				<executions>
-					<execution>
-						<id>sort</id>
-						<goals>
-							<goal>sort</goal>
-						</goals>
-						<phase>verify</phase>
-					</execution>
-				</executions>
-			</plugin>
+
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>

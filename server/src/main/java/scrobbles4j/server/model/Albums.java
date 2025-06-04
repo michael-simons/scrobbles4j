@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,7 @@ import java.util.TreeSet;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import org.jdbi.v3.core.Jdbi;
-
 import scrobbles4j.model.Artist;
 
 /**
@@ -44,34 +42,34 @@ public final class Albums {
 	}
 
 	/**
-	 * A collection of albums in which the given artist was involved. The list of artists will be empty if the album is
-	 * defined only by the search artist
-	 *
-	 * @param artist The artist to look for
-	 * @return Albums will be the key, and the value will be an optional list of artist that have published this album
+	 * A collection of albums in which the given artist was involved. The list of artists
+	 * will be empty if the album is defined only by the search artist
+	 * @param artist the artist to look for
+	 * @return albums will be the key, and the value will be an optional list of artist
+	 * that have published this album
 	 */
 	public Map<Album, Set<Artist>> findByArtist(Artist artist) {
 
 		var statement = """
-			SELECT DISTINCT t.album AS album_name, t.year AS album_year, a.artist AS artist_name
-			FROM tracks t
-			JOIN artists a ON a.id = t.artist_id
-			WHERE (a.artist = :artist OR a.artist like '%& ' || :artist OR a.artist like :artist || ' &%')
-			  AND t.year IS NOT NULL
-			UNION ALL
-			SELECT DISTINCT t.album AS album_name, t.year AS album_year, a.artist AS artist_name
-			FROM tracks t
-			JOIN artists a ON a.id = t.artist_id
-			WHERE (lower(t.name) like lower('%[feat. ' || :artist || ']') OR lower(t.name) like lower('%[with ' || :artist || ']'))
-			  AND t.year IS NOT NULL
-			ORDER BY album_year, album_name
-			""";
+				SELECT DISTINCT t.album AS album_name, t.year AS album_year, a.artist AS artist_name
+				FROM tracks t
+				JOIN artists a ON a.id = t.artist_id
+				WHERE (a.artist = :artist OR a.artist like '%& ' || :artist OR a.artist like :artist || ' &%')
+				  AND t.year IS NOT NULL
+				UNION ALL
+				SELECT DISTINCT t.album AS album_name, t.year AS album_year, a.artist AS artist_name
+				FROM tracks t
+				JOIN artists a ON a.id = t.artist_id
+				WHERE (lower(t.name) like lower('%[feat. ' || :artist || ']') OR lower(t.name) like lower('%[with ' || :artist || ']'))
+				  AND t.year IS NOT NULL
+				ORDER BY album_year, album_name
+				""";
 
-		return this.db.withHandle(handle -> handle
-			.createQuery(statement)
+		return this.db.withHandle(handle -> handle.createQuery(statement)
 			.bind("artist", artist.name())
 			.reduceRows(new LinkedHashMap<>(), (m, rv) -> {
-				var artists = m.computeIfAbsent(rv.getRow(Album.class), album -> new TreeSet<>(Comparator.comparing(Artist::name)));
+				var artists = m.computeIfAbsent(rv.getRow(Album.class),
+						album -> new TreeSet<>(Comparator.comparing(Artist::name)));
 				var albumArtist = rv.getRow(Artist.class);
 				if (!albumArtist.name().equals(artist.name())) {
 					artists.add(albumArtist);
@@ -79,4 +77,5 @@ public final class Albums {
 				return m;
 			}));
 	}
+
 }

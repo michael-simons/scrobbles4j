@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,6 @@
  */
 package scrobbles4j.server.scrobbles;
 
-import scrobbles4j.model.Artist;
-import scrobbles4j.model.DiscNumber;
-import scrobbles4j.model.Genre;
-import scrobbles4j.model.PlayedTrack;
-import scrobbles4j.model.Track;
-import scrobbles4j.model.TrackNumber;
-
 import java.net.URI;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -31,8 +24,13 @@ import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import org.jdbi.v3.core.Jdbi;
+import scrobbles4j.model.Artist;
+import scrobbles4j.model.DiscNumber;
+import scrobbles4j.model.Genre;
+import scrobbles4j.model.PlayedTrack;
+import scrobbles4j.model.Track;
+import scrobbles4j.model.TrackNumber;
 
 /**
  * Gets the latest scrobbles or creates new ones.
@@ -55,20 +53,17 @@ final class ScrobbleService {
 	ScrobbleStats getScrobbleStats() {
 
 		var statement = """
-			SELECT min(played_on) AS first,
-			       max(played_on) AS latest,
-			       count(*) AS num_scrobbles
-			FROM plays;
-			""";
+				SELECT min(played_on) AS first,
+				       max(played_on) AS latest,
+				       count(*) AS num_scrobbles
+				FROM plays;
+				""";
 
 		return this.db.withHandle(handle -> handle.createQuery(statement).map((rs, ctx) -> {
 			var first = rs.getTimestamp("first");
 			var latest = rs.getTimestamp("latest");
-			return new ScrobbleStats(
-				first == null ? null : first.toInstant(),
-				latest == null ? null : latest.toInstant(),
-				rs.getInt("num_scrobbles")
-			);
+			return new ScrobbleStats((first != null) ? first.toInstant() : null,
+					(latest != null) ? latest.toInstant() : null, rs.getInt("num_scrobbles"));
 		}).one());
 	}
 
@@ -85,53 +80,48 @@ final class ScrobbleService {
 	}
 
 	/**
-	 * The latest track before a given cut off date
-	 *
-	 * @param maxResults The number of tracks to be received
-	 * @param cutOffDate The date beyond which no tracks should be returned
-	 * @return A collection of played tracks
+	 * The latest track before a given cut off date.
+	 * @param maxResults the number of tracks to be received
+	 * @param cutOffDate the date beyond which no tracks should be returned
+	 * @return a collection of played tracks
 	 */
 	Collection<PlayedTrack> getLatest(int maxResults, Instant cutOffDate) {
 
 		var statement = """
-			SELECT a.artist, a.wikipedia_link, g.genre,
-			       t.*,
-			       p.played_on
-			FROM plays p
-			JOIN tracks t ON t.id = p.track_id
-			JOIN artists a ON a.id = t.artist_id
-			JOIN genres g ON g.id = t.genre_id
-			WHERE p.played_on >= :cutOffDate
-			ORDER BY p.played_on DESC
-			LIMIT :maxResults
-			""";
+				SELECT a.artist, a.wikipedia_link, g.genre,
+				       t.*,
+				       p.played_on
+				FROM plays p
+				JOIN tracks t ON t.id = p.track_id
+				JOIN artists a ON a.id = t.artist_id
+				JOIN genres g ON g.id = t.genre_id
+				WHERE p.played_on >= :cutOffDate
+				ORDER BY p.played_on DESC
+				LIMIT :maxResults
+				""";
 
 		return this.db.withHandle(handle -> handle.createQuery(statement)
 			.bind("cutOffDate", Timestamp.from(cutOffDate))
 			.bind("maxResults", maxResults)
 			.map((rs, ctx) -> {
 
-				var wikipediaLink = rs.getString("wikipedia_link") == null ? null : URI.create(rs.getString("wikipedia_link"));
+				var wikipediaLink = (rs.getString("wikipedia_link") != null)
+						? URI.create(rs.getString("wikipedia_link")) : null;
 				var artist = new Artist(rs.getString("artist"), wikipediaLink);
 				var genre = new Genre(rs.getString("genre"));
 				var trackNumber = new TrackNumber(rs.getInt("track_number"),
-					rs.getObject("track_count", Integer.class));
+						rs.getObject("track_count", Integer.class));
 				var discNumber = new DiscNumber(rs.getInt("disc_number"), rs.getObject("disc_count", Integer.class));
 
-				var track = new Track(
-					artist, genre,
-					rs.getString("album"), rs.getString("name"),
-					rs.getObject("year", Integer.class),
-					rs.getObject("rating", Integer.class),
-					rs.getObject("duration", Integer.class),
-					rs.getObject("played_count", Integer.class),
-					rs.getString("comment"),
-					trackNumber, discNumber,
-					"t".equalsIgnoreCase(rs.getString("compilation"))
-				);
+				var track = new Track(artist, genre, rs.getString("album"), rs.getString("name"),
+						rs.getObject("year", Integer.class), rs.getObject("rating", Integer.class),
+						rs.getObject("duration", Integer.class), rs.getObject("played_count", Integer.class),
+						rs.getString("comment"), trackNumber, discNumber,
+						"t".equalsIgnoreCase(rs.getString("compilation")));
 
 				return new PlayedTrack(track, rs.getTimestamp("played_on").toInstant());
 			})
 			.collect(Collectors.toList()));
 	}
+
 }

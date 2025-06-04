@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,36 +15,26 @@
  */
 package scrobbles4j.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author Michael J. Simons
- * @soundtrack Garbage - The World Is Not Enough
  * @since 2021-10-06
  */
-class TrackTest {
+class TrackTests {
 
 	@Test
 	void ofPropertiesShouldWork() {
 
-		var properties = Map.<String, Object>ofEntries(
-			Map.entry("artist", "Queen"),
-			Map.entry("genre", "Rock"),
-			Map.entry("name", "White Queen"),
-			Map.entry("year", 1974),
-			Map.entry("album", "Queen II"),
-			Map.entry("trackNumber", 3),
-			Map.entry("trackCount", 11),
-			Map.entry("discNumber", 1),
-			Map.entry("discCount", 2),
-			Map.entry("duration", 123.0),
-			Map.entry("rating", 5),
-			Map.entry("comment", "Amazing")
-		);
+		var properties = Map.<String, Object>ofEntries(Map.entry("artist", "Queen"), Map.entry("genre", "Rock"),
+				Map.entry("name", "White Queen"), Map.entry("year", 1974), Map.entry("album", "Queen II"),
+				Map.entry("trackNumber", 3), Map.entry("trackCount", 11), Map.entry("discNumber", 1),
+				Map.entry("discCount", 2), Map.entry("duration", 123.0), Map.entry("rating", 5),
+				Map.entry("comment", "Amazing"));
 
 		var track = Track.of(properties);
 		assertThat(track).extracting(Track::artist).extracting(Artist::name).isEqualTo("Queen");
@@ -59,4 +49,5 @@ class TrackTest {
 		assertThat(track).extracting(Track::discNumber).isEqualTo(new DiscNumber(1, 2));
 		assertThat(track.compilation()).isFalse();
 	}
+
 }

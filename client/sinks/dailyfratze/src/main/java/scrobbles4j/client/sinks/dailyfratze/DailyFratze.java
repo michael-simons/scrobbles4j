@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,12 +42,14 @@ import scrobbles4j.model.PlayedTrack;
 import scrobbles4j.model.Track;
 
 /**
+ * Basically recreates what I used to run as an Apple script.
+ *
  * @author Michael J. Simons
  * @since 2021-10-06
  */
 public final class DailyFratze extends AbstractSink {
 
-	private final Logger log = Logger.getLogger(DailyFratze.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(DailyFratze.class.getName());
 
 	/**
 	 * Little surprising the client by which we access the endpoint.
@@ -83,28 +85,31 @@ public final class DailyFratze extends AbstractSink {
 	private Function<String, String> encoder;
 
 	/**
-	 * Public constructor required by the Java Service API. Also used to initialize the user agent.
+	 * Public constructor required by the Java Service API. Also used to initialize the
+	 * user agent.
 	 */
 	public DailyFratze() {
 
 		var descriptor = getClass().getModule().getDescriptor();
-		ua = descriptor.name() + descriptor.version().map(v -> "/" + v).orElse("");
+		this.ua = descriptor.name() + descriptor.version().map(v -> "/" + v).orElse("");
 	}
 
 	@Override
 	public void init(Map<String, String> config) {
 
 		doInitialize(() -> {
-			bearerToken = Optional.ofNullable(config.get("bearerToken"))
-				.map(String::trim).filter(Predicate.not(String::isBlank)).orElseThrow(() -> new IllegalArgumentException("Bearer token is required."));
+			this.bearerToken = Optional.ofNullable(config.get("bearerToken"))
+				.map(String::trim)
+				.filter(Predicate.not(String::isBlank))
+				.orElseThrow(() -> new IllegalArgumentException("Bearer token is required."));
 
-			endpoint = Optional.ofNullable(config.get("endpoint"))
+			this.endpoint = Optional.ofNullable(config.get("endpoint"))
 				.map(String::trim)
 				.filter(Predicate.not(String::isBlank))
 				.map(URI::create)
 				.orElseThrow(() -> new IllegalArgumentException("Endpoint is required."));
 
-			encoder = switch (config.getOrDefault("encoder", "buggyEncoder")) {
+			this.encoder = switch (config.getOrDefault("encoder", "buggyEncoder")) {
 				case "buggyEncoder" -> buggyEncoder();
 				case "newEncoder" -> newEncoder();
 				default -> throw new IllegalArgumentException("Unsupported encoder '" + config.get("encoder") + "'");
@@ -125,18 +130,19 @@ public final class DailyFratze extends AbstractSink {
 			return;
 		}
 
-		synchronized (latestTrackBySource) {
-			var previousTrack = latestTrackBySource.get(event.source());
+		synchronized (this.latestTrackBySource) {
+			var previousTrack = this.latestTrackBySource.get(event.source());
 			if (previousTrack != null && previousTrack.equals(track)) {
 				return;
 			}
 
 			try {
-				var response = post(asProperties(event.track(), null, encoder));
-				log.log(Level.INFO, "{0} ({1})", new Object[] {response.body(), response.statusCode()});
-				latestTrackBySource.put(event.source(), track);
-			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
+				var response = post(asProperties(event.track(), null, this.encoder));
+				LOGGER.log(Level.INFO, "{0} ({1})", new Object[] { response.body(), response.statusCode() });
+				this.latestTrackBySource.put(event.source(), track);
+			}
+			catch (IOException | InterruptedException ex) {
+				ex.printStackTrace();
 			}
 		}
 	}
@@ -150,27 +156,29 @@ public final class DailyFratze extends AbstractSink {
 
 		for (var playedTrack : playedTracks) {
 			try {
-				var response = post(asProperties(playedTrack.track(), playedTrack.playedOn(), encoder));
-				log.log(Level.INFO, "{0} ({1})", new Object[] {response.body(), response.statusCode()});
-			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
+				var response = post(asProperties(playedTrack.track(), playedTrack.playedOn(), this.encoder));
+				LOGGER.log(Level.INFO, "{0} ({1})", new Object[] { response.body(), response.statusCode() });
+			}
+			catch (IOException | InterruptedException ex) {
+				ex.printStackTrace();
 			}
 		}
 	}
 
 	private HttpResponse<String> post(Map<String, String> properties) throws IOException, InterruptedException {
-		var body = properties.entrySet().stream()
-			.map(entry -> String.format("%s=%s", entry.getKey(), encoder.apply(entry.getValue())))
+		var body = properties.entrySet()
+			.stream()
+			.map(entry -> String.format("%s=%s", entry.getKey(), this.encoder.apply(entry.getValue())))
 			.collect(Collectors.joining("&"));
 
-		var request = HttpRequest.newBuilder(endpoint)
-			.header("User-Agent", ua)
-			.header("Authorization", String.format("Bearer %s", bearerToken))
+		var request = HttpRequest.newBuilder(this.endpoint)
+			.header("User-Agent", this.ua)
+			.header("Authorization", String.format("Bearer %s", this.bearerToken))
 			.header("Content-Type", "application/x-www-form-urlencoded")
 			.POST(HttpRequest.BodyPublishers.ofString(body))
 			.build();
 
-		return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+		return this.httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 	}
 
 	/**
@@ -179,10 +187,7 @@ public final class DailyFratze extends AbstractSink {
 	static Function<String, String> buggyEncoder() {
 
 		return s -> Optional.ofNullable(s)
-			.map(value -> value
-				.replaceAll("&", "%26")
-				.replaceAll(" ", "%20")
-				.replaceAll("\n", "%0A"))
+			.map(value -> value.replaceAll("&", "%26").replaceAll(" ", "%20").replaceAll("\n", "%0A"))
 			.orElse("");
 	}
 
@@ -191,22 +196,21 @@ public final class DailyFratze extends AbstractSink {
 	 */
 	static Function<String, String> newEncoder() {
 
-		return s -> Optional.ofNullable(s)
-			.map(value -> URLEncoder.encode(s, StandardCharsets.UTF_8))
-			.orElse("");
+		return s -> Optional.ofNullable(s).map(value -> URLEncoder.encode(s, StandardCharsets.UTF_8)).orElse("");
 	}
 
 	static Map<String, String> asProperties(Track track, Instant playedOn, Function<String, String> encoder) {
 
 		// https://mizosoft.github.io/methanol/multipart_and_forms/
-		// would be nicer, but as it turns out, the FormBodyPublisher does not allow for a custom
+		// would be nicer, but as it turns out, the FormBodyPublisher does not allow for a
+		// custom
 		// encoder, which we need here to be able to recreate the old scrobblers behaviour
 
 		var properties = new LinkedHashMap<String, String>();
 		properties.put("artist[artist]", track.artist().name());
 		properties.put("genre[genre]", track.genre().name());
 		properties.put("track[name]", track.name());
-		properties.put("track[played_count]", Integer.toString(track.playedCount() + (playedOn == null ? 1 : 0)));
+		properties.put("track[played_count]", Integer.toString(track.playedCount() + ((playedOn != null) ? 0 : 1)));
 		if (track.rating() != null) {
 			properties.put("track[rating]", Integer.toString(track.rating()));
 		}
@@ -235,7 +239,8 @@ public final class DailyFratze extends AbstractSink {
 		properties.put("track[comment]", encoder.apply(track.comment()));
 
 		if (playedOn != null) {
-			// This behaviour (system default zone) is actually the same as the previous iTunes Script
+			// This behaviour (system default zone) is actually the same as the previous
+			// iTunes Script
 			var playedOnInZone = playedOn.atZone(ZoneId.systemDefault());
 			properties.put("date[y]", Integer.toString(playedOnInZone.getYear()));
 			properties.put("date[M]", Integer.toString(playedOnInZone.getMonthValue()));
@@ -247,4 +252,5 @@ public final class DailyFratze extends AbstractSink {
 
 		return Collections.unmodifiableMap(properties);
 	}
+
 }

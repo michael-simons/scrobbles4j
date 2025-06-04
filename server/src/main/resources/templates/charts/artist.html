@@ -15,9 +15,14 @@
         </nav>
 
         <main>
-            {#if summary.present}
+            {#if summary}
             <section>
                 <h2>{artist.name}</h2>
+                {#if image}
+                    <div class="artist-image">
+                        <img src="{image.get.src}" alt="Image of {artist.name}, from Wikimedia Commons">
+                    </div>
+                {/if}
                 <p>{summary}</p>
                 <p>Read more at: <a href="{artist.wikipediaLink}">{artist.wikipediaLink}</a></p>
             </section>
@@ -31,7 +36,7 @@
                     <a href="?q={str:urlEncode(artist.name)}&includeCompilations=true">Include tracks from compilations</a>
                 {/if}
                 </p>
-                {#if !topTracks.empty}
+                {#if topTracks}
                 <table class="table">
                     <thead>
                         <tr>
@@ -60,7 +65,7 @@
                 </p>
             </section>
 
-            {#if !relatedArtists.empty}
+            {#if relatedArtists}
             <section>
                 <h2 id="related-artist">Related artists</h2>
                 <ul>
@@ -71,7 +76,7 @@
             </section>
             {/if}
 
-            {#if !albumsByArtists.empty}
+            {#if albumsByArtists}
                 <section>
                 <h2 id="albums">Albums by or with {artist.name}</h2>
                 <ul>

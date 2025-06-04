@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@ import java.time.Duration;
 import java.time.Year;
 
 /**
+ * Stats per year.
+ *
  * @author Michael J. Simons
- * @param year          The year in question
- * @param previousYear  The previous year
- * @param nextYear      The next year
- * @param numScrobbles  Number of tracks played in the given year
- * @param totalDuration Total time
+ * @param year the year in question
+ * @param previousYear the previous year
+ * @param nextYear the next year
+ * @param numScrobbles number of tracks played in the given year
+ * @param totalDuration total time
  */
 public record YearStats(Year year, Year previousYear, Year nextYear, int numScrobbles, Duration totalDuration) {
 
@@ -32,18 +34,17 @@ public record YearStats(Year year, Year previousYear, Year nextYear, int numScro
 	 * {@return a formatted, total duration (in days, hours and minutes) of playtime}
 	 */
 	public String formattedTotalDuration() {
-		if (totalDuration.isZero()) {
+		if (this.totalDuration.isZero()) {
 			return "";
 		}
-		return String.format("%d days, %d hours and %d minutes", totalDuration.toDaysPart(),
-			totalDuration.toHoursPart(),
-			totalDuration.toMinutesPart());
+		return String.format("%d days, %d hours and %d minutes", this.totalDuration.toDaysPart(),
+				this.totalDuration.toHoursPart(), this.totalDuration.toMinutesPart());
 	}
 
 	/**
 	 * {@return true if there are no plays in this year}
 	 */
 	public boolean empty() {
-		return totalDuration.isZero() || numScrobbles == 0;
+		return this.totalDuration.isZero() || this.numScrobbles == 0;
 	}
 }

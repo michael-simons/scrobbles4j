@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@ package scrobbles4j.server.config;
 
 import java.net.URI;
 
-import jakarta.enterprise.inject.Produces;
-import jakarta.inject.Singleton;
-
 import javax.sql.DataSource;
 
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Singleton;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.ConstructorMapper;
-
 import scrobbles4j.model.Artist;
 import scrobbles4j.server.model.Album;
 
@@ -36,23 +34,25 @@ import scrobbles4j.server.model.Album;
 public final class JdbiProducer {
 
 	/**
-	 * @param dataSource The datasource for which Jdbi should be produced
+	 * Creates a new JDBI datasource.
+	 * @param dataSource the datasource for which Jdbi should be produced
 	 * @return a Jdbi instance
-	 * @throws Exception for everything that can happen while determining model constructors
+	 * @throws Exception for everything that can happen while determining model
+	 * constructors
 	 */
 	@Produces
 	@Singleton
 	public Jdbi jdbi(DataSource dataSource) throws Exception {
 
-		return Jdbi.create(dataSource)
-			.registerColumnMapper(URI.class, (rs, col, ctx) -> {
-				var value = rs.getString(col);
-				if (value == null || value.isBlank()) {
-					return null;
-				}
-				return URI.create(value);
-			})
+		return Jdbi.create(dataSource).registerColumnMapper(URI.class, (rs, col, ctx) -> {
+			var value = rs.getString(col);
+			if (value == null || value.isBlank()) {
+				return null;
+			}
+			return URI.create(value);
+		})
 			.registerRowMapper(Album.class, ConstructorMapper.of(Album.class, "album"))
 			.registerRowMapper(Artist.class, ConstructorMapper.of(Artist.class.getConstructor(String.class), "artist"));
 	}
+
 }

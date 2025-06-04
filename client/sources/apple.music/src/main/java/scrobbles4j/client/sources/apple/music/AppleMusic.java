@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,13 @@ import scrobbles4j.model.PlayedTrack;
 import scrobbles4j.model.Track;
 
 /**
+ * A source that watches Apple Music.
+ *
  * @author Michael J. Simons
  */
 public final class AppleMusic implements Source {
 
-	private final Logger log = Logger.getLogger(AppleMusic.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(AppleMusic.class.getName());
 
 	private final Application application = Application.getInstance();
 
@@ -47,13 +49,14 @@ public final class AppleMusic implements Source {
 	public State getCurrentState() {
 
 		try {
-			return switch (application.getPlayerState()) {
+			return switch (this.application.getPlayerState()) {
 				case STOPPED, PAUSED -> State.STOPPED;
 				case PLAYING -> State.PLAYING;
 				default -> State.UNKNOWN;
 			};
-		} catch (JaplScriptException e) {
-			log.log(Level.WARNING, this.getDisplayName() + " is unavailable.", e);
+		}
+		catch (JaplScriptException ex) {
+			LOGGER.log(Level.WARNING, this.getDisplayName() + " is unavailable.", ex);
 			return State.UNAVAILABLE;
 		}
 	}
@@ -61,19 +64,19 @@ public final class AppleMusic implements Source {
 	@Override
 	public Optional<PlayingTrack> getCurrentTrack() {
 
-		var trackHandle = application.getCurrentTrack();
+		var trackHandle = this.application.getCurrentTrack();
 		if (trackHandle == null) {
 			return Optional.empty();
 		}
 
 		var track = Track.of(trackHandle.getProperties());
-		return Optional.of(new PlayingTrack(track, application.getPlayerPosition()));
+		return Optional.of(new PlayingTrack(track, this.application.getPlayerPosition()));
 	}
 
 	@Override
 	public Collection<PlayedTrack> getSelectedTracks() {
 
-		return Arrays.stream(application.getSelection().cast(com.tagtraum.macos.music.Track[].class))
+		return Arrays.stream(this.application.getSelection().cast(com.tagtraum.macos.music.Track[].class))
 			.filter(trackHandle -> trackHandle.getProperties().containsKey("playedDate"))
 			.map(trackHandle -> {
 				var track = Track.of(trackHandle.getProperties());
@@ -81,4 +84,5 @@ public final class AppleMusic implements Source {
 			})
 			.toList();
 	}
+
 }

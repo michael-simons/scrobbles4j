@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,30 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 /**
+ * Prints the rank or omits it if the previous one is the same.
+ *
  * @author Michael J. Simons
  */
 public final class RankFormatter {
+
+	private final AtomicInteger previous = new AtomicInteger();
+
+	private RankFormatter() {
+	}
+
+	/**
+	 * Return the current rank if the current rank is higher than the previous one,
+	 * otherwise returns an empty string.
+	 * @param rank the current rank
+	 * @return a string with the rank if it changed
+	 */
+	public String format(int rank) {
+
+		if (this.previous.compareAndSet(rank - 1, rank)) {
+			return Integer.toString(rank);
+		}
+		return "";
+	}
 
 	/**
 	 * A supplier that returns a new formatter on each call.
@@ -37,24 +58,7 @@ public final class RankFormatter {
 		public RankFormatter get() {
 			return new RankFormatter();
 		}
+
 	}
 
-	private final AtomicInteger previous = new AtomicInteger();
-
-	private RankFormatter() {
-	}
-
-	/**
-	 * Return the current rank if the current rank is higher than the previous one, otherwise returns an empty string
-	 *
-	 * @param rank The current rank
-	 * @return A string with the rank if it changed
-	 */
-	public String format(int rank) {
-
-		if (previous.compareAndSet(rank - 1, rank)) {
-			return Integer.toString(rank);
-		}
-		return "";
-	}
 }

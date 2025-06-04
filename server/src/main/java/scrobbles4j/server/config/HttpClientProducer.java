@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,25 @@ import java.net.http.HttpClient;
 
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Singleton;
-
 import org.eclipse.microprofile.context.ManagedExecutor;
 
 /**
- * Creates a global instance of {@link java.net.http.HttpClient} configured to use the Quarkus' managed executor.
+ * Creates a global instance of {@link java.net.http.HttpClient} configured to use the
+ * Quarkus' managed executor.
  *
  * @author Michael J. Simons
  */
 public final class HttpClientProducer {
 
 	/**
-	 * @param managedExecutor A managed executor passed to the http client for executing asynchronous requests
+	 * Creates a new Http client using the same executor as Quarkus.
+	 * @param managedExecutor a managed executor passed to the http client for executing
+	 * asynchronous requests
 	 * @return a HTTP client
 	 */
 	@Produces
 	@Singleton
-	public HttpClient jdbi(ManagedExecutor managedExecutor) {
+	public HttpClient httpClient(ManagedExecutor managedExecutor) {
 
 		return HttpClient.newBuilder()
 			.version(HttpClient.Version.HTTP_1_1)
@@ -43,4 +45,5 @@ public final class HttpClientProducer {
 			.executor(managedExecutor)
 			.build();
 	}
+
 }

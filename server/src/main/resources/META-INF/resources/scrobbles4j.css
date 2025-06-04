@@ -29,3 +29,27 @@ a.am {
     font-size: 0.5em;
     vertical-align: middle;
 }
+
+div.artist-image {
+}
+
+div.image-box > * {
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    width: 320px;
+    margin: 5px;
+    padding: 5px;
+}
+
+div.image-box {
+    max-width: 1280px;
+    display: flex;
+    flex-flow: row wrap;
+    overflow-wrap: break-word;
+}
+
+div.artist-image img {
+    max-width: 320px;
+    height: 240px;
+    object-fit: contain;
+}

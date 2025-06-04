@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 package scrobbles4j.client.sinks.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Michael J. Simons
  */
-class SinkComparatorTest {
+class SinkComparatorTests {
 
 	@Test
 	void higherValuesShouldHavePrecedenceBecauseIHateTheWaySpringHasIt() {
@@ -34,7 +34,8 @@ class SinkComparatorTest {
 			public void onTrackPlaying(PlayingTrackEvent event) {
 			}
 
-			@Override public int getOrder() {
+			@Override
+			public int getOrder() {
 				return 1;
 			}
 		};
@@ -44,12 +45,13 @@ class SinkComparatorTest {
 			public void onTrackPlaying(PlayingTrackEvent event) {
 			}
 
-			@Override public int getOrder() {
+			@Override
+			public int getOrder() {
 				return 42;
 			}
 		};
 
-		assertThat(List.of(s1, s2).stream().sorted(SinkComparator.INSTANCE))
-			.containsExactly(s2, s1);
+		assertThat(Stream.of(s1, s2).sorted(SinkComparator.INSTANCE)).containsExactly(s2, s1);
 	}
+
 }

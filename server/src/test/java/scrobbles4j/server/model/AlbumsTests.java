@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,19 @@
  */
 package scrobbles4j.server.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.inject.Inject;
-
-import org.junit.jupiter.api.Test;
-
 import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
 import scrobbles4j.model.Artist;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @QuarkusTest
-class AlbumsTest {
+class AlbumsTests {
 
 	@Inject
 	Albums albums;
@@ -37,14 +35,13 @@ class AlbumsTest {
 	@Test
 	void findAlbumsByArtistsShouldWork() {
 
-		var albumsByDangerDan = albums.findByArtist(new Artist("Danger Dan", URI.create("https://de.wikipedia.org/wiki/Danger_Dan")));
-		assertThat(albumsByDangerDan)
-			.hasSize(4)
-			.contains(
-				Map.entry(new Album("Coming Out EP", 2008), Set.of()),
-				Map.entry(new Album("Shibuya Crossing", 2018), Set.of(new Artist("Juse Ju"))),
-				Map.entry(new Album("Traurige Clowns", 2010), Set.of(new Artist("Koljah & Danger Dan"))),
-				Map.entry(new Album("Aschenbecher", 2012), Set.of(new Artist("Danger Dan & NMZS")))
-			);
+		var albumsByDangerDan = this.albums
+			.findByArtist(new Artist("Danger Dan", URI.create("https://de.wikipedia.org/wiki/Danger_Dan")));
+		assertThat(albumsByDangerDan).hasSize(4)
+			.contains(Map.entry(new Album("Coming Out EP", 2008), Set.of()),
+					Map.entry(new Album("Shibuya Crossing", 2018), Set.of(new Artist("Juse Ju"))),
+					Map.entry(new Album("Traurige Clowns", 2010), Set.of(new Artist("Koljah & Danger Dan"))),
+					Map.entry(new Album("Aschenbecher", 2012), Set.of(new Artist("Danger Dan & NMZS"))));
 	}
+
 }

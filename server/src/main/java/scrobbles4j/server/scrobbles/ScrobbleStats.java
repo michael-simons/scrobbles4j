@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@ package scrobbles4j.server.scrobbles;
 import java.time.Instant;
 
 /**
+ * A record containing a stat aggregation.
+ *
  * @author Michael J. Simons
- * @param first        moment in time of the first scrobble
- * @param latest       moment in time of the latest scrobble
+ * @param first moment in time of the first scrobble
+ * @param latest moment in time of the latest scrobble
  * @param numScrobbles how many tracks have been scrobbled
  */
 public record ScrobbleStats(Instant first, Instant latest, int numScrobbles) {
@@ -29,6 +31,6 @@ public record ScrobbleStats(Instant first, Instant latest, int numScrobbles) {
 	 * {@return true if there are no scrobbles}
 	 */
 	public boolean isEmpty() {
-		return numScrobbles == 0;
+		return this.numScrobbles == 0;
 	}
 }

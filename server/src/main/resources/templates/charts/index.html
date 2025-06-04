@@ -23,7 +23,7 @@
                         <a href="?includeCompilations=true">Include tracks from compilations</a>
                     {/if}
                 </p>
-                {#if !topTracks.empty}
+                {#if topTracks}
                 <table class="table">
                     <thead>
                         <tr>
@@ -49,7 +49,7 @@
                 {/if}
             </section>
 
-            {#if !topAlbums.empty}
+            {#if topAlbums}
             <section>
                 <h2 id="top-albums">Top 10 Albums overall<sup>2</sup></h2>
                 <table class="table">
@@ -75,7 +75,7 @@
             </section>
             {/if}
 
-            {#if !topArtists.empty}
+            {#if topArtists}
             <section>
                 <h2 id="top-albums">Top {numArtists} Artists overall<sup>2</sup></h2>
                 <table class="table">
@@ -99,7 +99,7 @@
             </section>
             {/if}
 
-            {#if !topArtistsByYear.empty}
+            {#if topArtistsByYear}
             <section>
                 <h2 id="top-artists">Top {numArtists} artists per year in the last decade<sup>2, 3</sup></h2>
                 <table class="table">

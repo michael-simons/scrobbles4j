@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,12 @@
  */
 package scrobbles4j.client.app;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import scrobbles4j.client.sinks.api.PlayingTrackEvent;
 import scrobbles4j.client.sinks.api.Sink;
 import scrobbles4j.client.sources.api.PlayingTrack;
@@ -22,20 +28,17 @@ import scrobbles4j.client.sources.api.Source;
 import scrobbles4j.client.sources.api.State;
 import scrobbles4j.model.Track;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
+ * Connects a source and a sink.
+ *
  * @author Michael J. Simons
  */
 final class Pipe {
 
-	private final Logger log = Logger.getLogger(Pipe.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Pipe.class.getName());
 
 	private final Source source;
+
 	private final List<Sink> sinks;
 
 	Track lastTrack;
@@ -49,23 +52,27 @@ final class Pipe {
 
 		var currentTrack = Optional.<PlayingTrack>empty();
 		try {
-			if (source.getCurrentState() == State.PLAYING) {
-				currentTrack = source.getCurrentTrack();
+			if (this.source.getCurrentState() == State.PLAYING) {
+				currentTrack = this.source.getCurrentTrack();
 			}
-		} catch (Exception e) {
-			log.log(Level.WARNING, e, () -> "Could not retrieve current track from source '%s' in state %s".formatted(source.getDisplayName(), State.PLAYING));
+		}
+		catch (Exception ex) {
+			LOGGER.log(Level.WARNING, ex, () -> "Could not retrieve current track from source '%s' in state %s"
+				.formatted(this.source.getDisplayName(), State.PLAYING));
 		}
 
-		currentTrack
-			.map(this::createEvent).stream()
-			.flatMap(event -> sinks.stream().map(sink -> (Runnable) () -> sink.onTrackPlaying(event)))
+		currentTrack.map(this::createEvent)
+			.stream()
+			.flatMap(event -> this.sinks.stream().map(sink -> (Runnable) () -> sink.onTrackPlaying(event)))
 			.sequential()
 			.forEach(CompletableFuture::runAsync);
 	}
 
 	PlayingTrackEvent createEvent(PlayingTrack playingTrack) {
-		boolean seenBefore = playingTrack.track().equals(lastTrack);
-		lastTrack = playingTrack.track();
-		return new PlayingTrackEvent(playingTrack.track(), playingTrack.position(), seenBefore, source.getDisplayName());
+		boolean seenBefore = playingTrack.track().equals(this.lastTrack);
+		this.lastTrack = playingTrack.track();
+		return new PlayingTrackEvent(playingTrack.track(), playingTrack.position(), seenBefore,
+				this.source.getDisplayName());
 	}
+
 }

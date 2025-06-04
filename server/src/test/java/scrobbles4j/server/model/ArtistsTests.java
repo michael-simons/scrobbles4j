@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,15 @@
  */
 package scrobbles4j.server.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import jakarta.inject.Inject;
-
-import org.junit.jupiter.api.Test;
-
 import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
 import scrobbles4j.model.Artist;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @QuarkusTest
-class ArtistsTest {
+class ArtistsTests {
 
 	@Inject
 	Artists artists;
@@ -33,17 +31,17 @@ class ArtistsTest {
 	@Test
 	void findByNameShouldWork() {
 
-		var artist = artists.findByName("Queen");
+		var artist = this.artists.findByName("Queen");
 		assertThat(artist).hasValue(new Artist("Queen"));
 	}
 
 	@Test
 	void getAlbumsByArtistsShouldWork() {
 
-		var relatedToQueen = artists.findRelated(new Artist("Queen"));
-		assertThat(relatedToQueen)
-			.hasSize(2)
+		var relatedToQueen = this.artists.findRelated(new Artist("Queen"));
+		assertThat(relatedToQueen).hasSize(2)
 			.extracting(Artist::name)
 			.containsExactly("Freddie Mercury", "Roger Taylor");
 	}
+
 }

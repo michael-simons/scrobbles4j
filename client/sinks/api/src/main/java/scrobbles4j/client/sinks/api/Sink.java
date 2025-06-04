@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package scrobbles4j.client.sinks.api;
 
-import scrobbles4j.model.PlayedTrack;
-
 import java.util.Collection;
 import java.util.Map;
+
+import scrobbles4j.model.PlayedTrack;
 
 /**
  * A sink consuming playing tracks.
@@ -28,7 +28,8 @@ import java.util.Map;
 public interface Sink {
 
 	/**
-	 * {@return the order in which this sink should be called} A higher value means higher priority.
+	 * {@return the order in which this sink should be called} A higher value means higher
+	 * priority.
 	 */
 	default int getOrder() {
 		return 0;
@@ -43,24 +44,22 @@ public interface Sink {
 
 	/**
 	 * Configures this sink. Only called once.
-	 *
-	 * @param config The config map for this sink. Prefixes will be removed.
+	 * @param config the config map for this sink. Prefixes will be removed.
 	 */
 	default void init(Map<String, String> config) {
 	}
 
 	/**
 	 * This method is called by a source when a track is playing.
-	 *
-	 * @param event An event containing the playing track
+	 * @param event an event containing the playing track
 	 */
 	void onTrackPlaying(PlayingTrackEvent event);
 
 	/**
 	 * Consumes a list of played tracks in bulk.
-	 *
-	 * @param playedTracks A collection of played tracks
+	 * @param playedTracks a collection of played tracks
 	 */
 	default void consumeAll(Collection<PlayedTrack> playedTracks) {
 	}
+
 }

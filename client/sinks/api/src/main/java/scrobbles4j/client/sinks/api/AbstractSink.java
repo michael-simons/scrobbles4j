@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,12 @@ public abstract class AbstractSink implements Sink {
 	private boolean initialized;
 
 	/**
-	 * Public constructor required by the Java Service API. Also marks this instance as not initialized.
+	 * Public constructor required by the Java Service API. Also marks this instance as
+	 * not initialized.
 	 */
 	protected AbstractSink() {
-		lock = new Object();
-		initialized = false;
+		this.lock = new Object();
+		this.initialized = false;
 	}
 
 	/**
@@ -45,25 +46,25 @@ public abstract class AbstractSink implements Sink {
 	 */
 	protected final boolean isInitialized() {
 
-		synchronized (lock) {
-			return initialized;
+		synchronized (this.lock) {
+			return this.initialized;
 		}
 	}
 
 	/**
 	 * Run the initializer inside a lock.
-	 *
-	 * @param initializer The initializer to run
+	 * @param initializer the initializer to run
 	 * @throws IllegalStateException if the sink has already been initialized
 	 */
 	protected final void doInitialize(Runnable initializer) {
 
-		synchronized (lock) {
-			if (initialized) {
+		synchronized (this.lock) {
+			if (this.initialized) {
 				throw new IllegalStateException("Sink has been already initialized");
 			}
 			initializer.run();
-			initialized = true;
+			this.initialized = true;
 		}
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package scrobbles4j.server.util;
 import io.quarkus.qute.TemplateExtension;
 
 /**
- * Generates links to Apples Shortcuts application, running the shortcuts with the same name. See
- * <a href="https://support.apple.com/de-de/guide/shortcuts-mac/apd624386f42/mac">Kurzbefehl mit einer URL ausführen</a>.
+ * Generates links to Apples Shortcuts application, running the shortcuts with the same
+ * name. See <a href=
+ * "https://support.apple.com/de-de/guide/shortcuts-mac/apd624386f42/mac">Kurzbefehl mit
+ * einer URL ausführen</a>.
  *
  * @author Michael J. Simons
  */
@@ -27,23 +29,21 @@ import io.quarkus.qute.TemplateExtension;
 public final class Shortcuts {
 
 	static String pushTrack(String artist, String name) {
-		return "shortcuts://run-shortcut?name=Push%%20track&input=text&text=%s%%0A%s".formatted(
-			StrExtensions.urlEncode(artist), StrExtensions.urlEncode(name)
-		);
+		return "shortcuts://run-shortcut?name=Push%%20track&input=text&text=%s%%0A%s"
+			.formatted(StrExtensions.urlEncode(artist), StrExtensions.urlEncode(name));
 	}
 
 	static String pushAlbum(String artist, String name) {
-		return "shortcuts://run-shortcut?name=Push%%20album&input=text&text=%s%%0A%s".formatted(
-			StrExtensions.urlEncode(artist), StrExtensions.urlEncode(name)
-		);
+		return "shortcuts://run-shortcut?name=Push%%20album&input=text&text=%s%%0A%s"
+			.formatted(StrExtensions.urlEncode(artist), StrExtensions.urlEncode(name));
 	}
 
 	static String queueTrack(String artist, String name) {
-		return "shortcuts://run-shortcut?name=Queue%%20track&input=text&text=%s%%0A%s".formatted(
-			StrExtensions.urlEncode(artist), StrExtensions.urlEncode(name)
-		);
+		return "shortcuts://run-shortcut?name=Queue%%20track&input=text&text=%s%%0A%s"
+			.formatted(StrExtensions.urlEncode(artist), StrExtensions.urlEncode(name));
 	}
 
 	private Shortcuts() {
 	}
+
 }

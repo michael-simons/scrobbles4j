@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 
-    Copyright 2021-2024 the original author or authors.
+    Copyright 2021-2025 the original author or authors.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
 
 -->
 <!DOCTYPE suppressions PUBLIC
-    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
-    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+		"-//Puppy Crawl//DTD Suppressions 1.1//EN"
+		"http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
-    <suppress checks="RegexpHeader" files="package-info\.java"/>
-    <suppress checks="[a-zA-Z0-9]*" files="[\\/]generated-test-sources[\\/]"/>
+	<suppress checks="InterfaceIsType" files="Neo4jDriverExtensions\.java"/>
+	<suppress checks="InterfaceIsType" files="Neo4jStatement\.java"/>
+	<suppress checks="RegexpHeader" files="package-info\.java"/>
+	<suppress checks="[a-zA-Z0-9]*" files="[\\/]generated-test-sources[\\/]"/>
+	<suppress checks="JavadocVariable" files="org[\\/]neo4j[\\/]jdbc[\\/]internal[\\/]bolt"/>
 </suppressions>
