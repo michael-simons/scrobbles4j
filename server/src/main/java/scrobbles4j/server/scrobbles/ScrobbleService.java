@@ -80,7 +80,7 @@ final class ScrobbleService {
 	}
 
 	/**
-	 * The latest track before a given cut off date.
+	 * The latest track before a given cut-off date.
 	 * @param maxResults the number of tracks to be received
 	 * @param cutOffDate the date beyond which no tracks should be returned
 	 * @return a collection of played tracks

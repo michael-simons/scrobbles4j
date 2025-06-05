@@ -16,23 +16,34 @@
 package scrobbles4j.server.charts;
 
 import java.time.Duration;
-import java.time.Year;
+import java.time.YearMonth;
 
 /**
- * Stats per year.
+ * Monthly statistics.
  *
  * @author Michael J. Simons
- * @param year the year in question
- * @param previousYear the previous year
- * @param nextYear the next year
+ * @param month the month
  * @param numScrobbles number of tracks played in the given year
  * @param duration total time
  */
-public record YearStats(Year year, Year previousYear, Year nextYear, int numScrobbles,
-		Duration duration) implements HasDuration {
+public record MonthStats(YearMonth month, int numScrobbles, Duration duration) implements HasDuration {
 
 	/**
-	 * {@return true if there are no plays in this year}
+	 * {@return the previous month}
+	 */
+	public YearMonth previous() {
+		return this.month.minusMonths(1);
+	}
+
+	/**
+	 * {@return the next month}
+	 */
+	public YearMonth next() {
+		return this.month.plusMonths(1);
+	}
+
+	/**
+	 * {@return true if there are no plays in this month}
 	 */
 	public boolean empty() {
 		return this.duration.isZero() || this.numScrobbles == 0;

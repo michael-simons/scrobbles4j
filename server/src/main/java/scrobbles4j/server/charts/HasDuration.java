@@ -16,25 +16,36 @@
 package scrobbles4j.server.charts;
 
 import java.time.Duration;
-import java.time.Year;
 
 /**
- * Stats per year.
+ * A marker interface for stats that have a duration.
  *
  * @author Michael J. Simons
- * @param year the year in question
- * @param previousYear the previous year
- * @param nextYear the next year
- * @param numScrobbles number of tracks played in the given year
- * @param duration total time
  */
-public record YearStats(Year year, Year previousYear, Year nextYear, int numScrobbles,
-		Duration duration) implements HasDuration {
+public interface HasDuration {
 
 	/**
-	 * {@return true if there are no plays in this year}
+	 * {@return a formatted, total duration (in days, hours and minutes) of playtime}
 	 */
-	public boolean empty() {
-		return this.duration.isZero() || this.numScrobbles == 0;
+	default String formattedDuration() {
+		if (duration().isZero()) {
+			return "";
+		}
+
+		var days = duration().toDaysPart();
+		var hours = duration().toHoursPart();
+		var minutes = duration().toMinutesPart();
+		return String.format("%d day%s, %d hour%s and %d minute%s", days, plural(days), hours, plural(hours), minutes,
+				plural(minutes));
 	}
+
+	private String plural(long value) {
+		return (value > 1) ? "s" : "";
+	}
+
+	/**
+	 * {@return the total duration of tracks played in this period}
+	 */
+	Duration duration();
+
 }

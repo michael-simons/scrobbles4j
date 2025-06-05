@@ -14,6 +14,7 @@
         </nav>
 
         <main>
+            <h1>Charts</h1>
             <section>
                 <h2 id="top-tracks">Top 10 Tracks overall<sup>1{#if !includeCompilations}, 2{/if}</sup></h2>
                 <p>
@@ -77,7 +78,7 @@
 
             {#if topArtists}
             <section>
-                <h2 id="top-albums">Top {numArtists} Artists overall<sup>2</sup></h2>
+                <h2 id="top-artists-overall">Top {numArtists} Artists overall<sup>2</sup></h2>
                 <table class="table">
                     <thead>
                     <tr>
@@ -101,7 +102,7 @@
 
             {#if topArtistsByYear}
             <section>
-                <h2 id="top-artists">Top {numArtists} artists per year in the last decade<sup>2, 3</sup></h2>
+                <h2 id="top-artists-per-year">Top {numArtists} artists per year in the last decade<sup>2, 3</sup></h2>
                 <table class="table">
                     <thead>
                         <tr>
@@ -131,8 +132,8 @@
             {/if}
 
             <p>
-                <sup>1</sup>Tracks are aggregated by artist and track name which means that potentially different versions of a track on different albums are counted together. A track must have been played at least 2 times to appear.<br />
-                <sup>2</sup>Compilations are excluded.<br />
+                <sup>1</sup>Tracks are aggregated by artist and track name which means that potentially different versions of a track on different albums are counted together. A track must have been played at least 2 times to appear.<br>
+                <sup>2</sup>Compilations are excluded.<br>
                 <sup>3</sup>Shown are the top {numArtists} artists per decade. An entry is considered new in a year when it didn't make that rank in the previous year.
             </p>
         </main>

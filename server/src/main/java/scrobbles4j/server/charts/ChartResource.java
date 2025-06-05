@@ -130,8 +130,11 @@ public class ChartResource {
 		var maxMonth = YearMonth.now();
 		var months = new ArrayList<YearMonth>();
 		var month = year.atMonth(1);
-		while (month.isBefore(maxMonth) && months.size() < 12) {
+		while (month.isBefore(maxMonth)) {
 			months.add(month);
+			if (month.getMonthValue() == 12) {
+				break;
+			}
 			month = month.plusMonths(1);
 		}
 
@@ -171,6 +174,8 @@ public class ChartResource {
 		record NameAndImage(String name, Optional<WikimediaImage> image) {
 		}
 
+		var summary = CompletableFuture.supplyAsync(() -> this.chartService.getStats(yearMonth));
+
 		var top5Artists = CompletableFuture
 			.supplyAsync(() -> this.chartService.getTopNArtists(5, yearMonth), this.managedExecutor)
 			.thenApply(rankedEntries -> rankedEntries.stream()
@@ -180,14 +185,12 @@ public class ChartResource {
 				.map(CompletableFuture::join)
 				.toList());
 
+		var top1Tracks = CompletableFuture.supplyAsync(() -> this.chartService.getTop1Tracks(yearMonth));
+
 		var top5Albums = CompletableFuture.supplyAsync(() -> this.chartService.getTopNAlbums(5, yearMonth),
 				this.managedExecutor);
 
-		var top1Tracks = this.chartService.getTop1Tracks(yearMonth);
-
-		return this.monthTemplate.data("previous", yearMonth.minusMonths(1))
-			.data("current", yearMonth)
-			.data("next", yearMonth.plusMonths(1))
+		return this.monthTemplate.data("summary", summary)
 			.data("locale", Locale.ENGLISH)
 			.data("tracks", top1Tracks)
 			.data("artists", top5Artists)

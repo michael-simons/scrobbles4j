@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Charts | {current}</title>
+        <title>Charts | {summary.month}</title>
         <link rel="stylesheet" href="/scrobbles4j.css">
     </head>
     <body>
@@ -10,14 +10,21 @@
             <ul>
                 <li><a href="/">Start</a></li>
                 <li><a href="/charts">Charts</a></li>
-                <li><a href="/charts/{current.year}">{current.year}</a></li>
+                <li><a href="/charts/{summary.month.year}">{summary.month.year}</a></li>
                 <li>
-                    <a href="/charts/{previous.year}/{previous.monthValue}">«</a>&nbsp;{current.format('MMMM', locale)}&nbsp;<a href="/charts/{next.year}/{next.monthValue}">»</a>
+                    <a href="/charts/{summary.previous.year}/{summary.previous.monthValue}">«</a>&nbsp;{summary.month.format('MMMM', locale)}&nbsp;<a href="/charts/{summary.next.year}/{summary.next.monthValue}">»</a>
                 </li>
             </ul>
         </nav>
 
         <main>
+            <h1>{summary.month.format('MMMM yyyy', locale)}</h1>
+            {#if !summary.empty}
+            <p>
+                Scrobbled <strong>{summary.numScrobbles}</strong> tracks in {summary.month.format('MMMM', locale)} for a total duration of
+                {summary.formattedDuration}.
+            </p>
+            {/if}
             {#if artists}
             <section>
                 <h2>Top {artists.size} artists</h2>

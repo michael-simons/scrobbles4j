@@ -76,6 +76,27 @@ final class ChartService {
 	}
 
 	/**
+	 * Return stats for the given month.
+	 * @param month the month in question
+	 * @return stats for the given month
+	 */
+	MonthStats getStats(YearMonth month) {
+
+		var statement = """
+				SELECT count(*) AS num_scrobbles, sum(duration) AS total_duration
+				FROM tracks t JOIN plays p ON t.id = p.track_id
+				WHERE year(p.played_on) = :year and month(p.played_on) = :month
+				""";
+
+		return this.db.withHandle(handle -> handle.createQuery(statement)
+			.bind("year", month.getYear())
+			.bind("month", month.getMonthValue())
+			.map((rs, ctx) -> new MonthStats(month, rs.getInt("num_scrobbles"),
+					Duration.ofSeconds(rs.getLong("total_duration"))))
+			.one());
+	}
+
+	/**
 	 * Gets the topn n artists by year.
 	 * @param maxRank the maximum entries
 	 * @param numYears the maximum number of years
