@@ -51,9 +51,6 @@
 					<argLine>--add-opens scrobbles4j.model/scrobbles4j.model=ALL-UNNAMED</argLine>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-			</plugin>
 		</plugins>
 	</build>
 </project>

@@ -352,6 +352,13 @@
 					<extensions>true</extensions>
 					<configuration>
 						<skip>true</skip>
+						<skipPlugins>
+							<plugin>com.github.ekryd.sortpom:sortpom-maven-plugin</plugin>
+							<plugin>com.mycila:license-maven-plugin</plugin>
+							<plugin>io.spring.javaformat:spring-javaformat-maven-plugin</plugin>
+							<plugin>org.apache.maven.plugins:maven-checkstyle-plugin</plugin>
+							<plugin>org.apache.maven.plugins:maven-enforcer-plugin</plugin>
+						</skipPlugins>
 					</configuration>
 					<executions>
 						<execution>
@@ -450,13 +457,6 @@
 					<detectOfflineLinks>false</detectOfflineLinks>
 					<detectJavaApiLink>true</detectJavaApiLink>
 					<release>${maven.compiler.release}</release>
-					<tags>
-						<tag>
-							<name>soundtrack</name>
-							<placement>X</placement>
-							<head>Soundtrack</head>
-						</tag>
-					</tags>
 				</configuration>
 				<executions>
 					<execution>

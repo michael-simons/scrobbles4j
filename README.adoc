@@ -62,14 +62,14 @@ This will bring up MariaDB inside a container:
 
 [source,bash]
 ----
-./mvnw -Dlicense.skip quarkus:dev
+./mvnw quarkus:dev
 ----
 
 To point it to your own instance run:
 
 [source,bash]
 ----
-./mvnw -Dlicense.skip quarkus:dev \
+./mvnw quarkus:dev \
   -Dquarkus.datasource.jdbc.url=jdbc:mariadb://127.0.0.1:3306/music\?useJDBCCompliantTimezoneShift=true\&useUnicode=true\&serverTimezone=UTC\&useGmtMillisForDatetimes=true\&useLegacyDatetimeCode=false\&useTimezone=true \
   -Dquarkus.datasource.username=root \
   -Dquarkus.datasource.password=secret
