@@ -71,7 +71,7 @@
 		<maven-jlink-plugin.version>3.2.0</maven-jlink-plugin.version>
 		<maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
-		<maven.compiler.release>17</maven.compiler.release>
+		<maven.compiler.release>24</maven.compiler.release>
 		<maven.version>3.9.9</maven.version>
 		<mockito.version>5.18.0</mockito.version>
 		<picocli.version>4.7.7</picocli.version>
@@ -359,6 +359,11 @@
 							<plugin>org.apache.maven.plugins:maven-checkstyle-plugin</plugin>
 							<plugin>org.apache.maven.plugins:maven-enforcer-plugin</plugin>
 						</skipPlugins>
+						<!--
+						 Exception java.lang.IllegalAccessError: module java.base does not open java.lang to unnamed module @7875ff50;
+						 to use the thread-local-reset capability on Java 24 or later, use this JVM option:
+						 -->
+						<jvmArgs>--add-opens java.base/java.lang=ALL-UNNAMED</jvmArgs>
 					</configuration>
 					<executions>
 						<execution>

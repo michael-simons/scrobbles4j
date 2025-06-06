@@ -133,7 +133,7 @@
 					<systemPropertyVariables>
 						<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
 					</systemPropertyVariables>
-					<argLine>-Duser.timezone=Europe/Berlin</argLine>
+					<argLine>-Duser.timezone=Europe/Berlin --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
 				</configuration>
 			</plugin>
 		</plugins>

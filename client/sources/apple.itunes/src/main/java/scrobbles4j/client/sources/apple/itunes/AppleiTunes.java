@@ -37,6 +37,12 @@ public final class AppleiTunes implements Source {
 
 	private final Application application = Application.getInstance();
 
+	/**
+	 * Required to work with the service loader.
+	 */
+	public AppleiTunes() {
+	}
+
 	@Override
 	public String getDisplayName() {
 		return "Apple iTunes™";

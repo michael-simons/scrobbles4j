@@ -75,6 +75,9 @@ public final class Launcher implements Runnable {
 		new CommandLine(new Launcher()).execute(args);
 	}
 
+	Launcher() {
+	}
+
 	/**
 	 * Subcommand that publishes only the selected tracks (in iTunes or Music).
 	 */

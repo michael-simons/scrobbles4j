@@ -31,6 +31,12 @@ public final class LoggingSink implements Sink {
 
 	private static final Logger LOGGER = Logger.getLogger(LoggingSink.class.getName());
 
+	/**
+	 * Required to work with the service loader.
+	 */
+	public LoggingSink() {
+	}
+
 	@Override
 	public boolean isActiveByDefault() {
 		return true;

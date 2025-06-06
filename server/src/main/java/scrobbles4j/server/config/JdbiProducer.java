@@ -33,6 +33,9 @@ import scrobbles4j.server.model.Album;
  */
 public final class JdbiProducer {
 
+	JdbiProducer() {
+	}
+
 	/**
 	 * Creates a new JDBI datasource.
 	 * @param dataSource the datasource for which Jdbi should be produced

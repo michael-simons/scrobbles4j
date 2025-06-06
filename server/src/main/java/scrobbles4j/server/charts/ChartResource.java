@@ -22,12 +22,15 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
 
 import io.quarkus.cache.CacheResult;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
+import io.quarkus.virtual.threads.VirtualThreads;
+import io.smallrye.common.annotation.RunOnVirtualThread;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -38,7 +41,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.context.ManagedExecutor;
 import scrobbles4j.server.model.Albums;
 import scrobbles4j.server.model.Artists;
 import scrobbles4j.server.model.WikimediaImage;
@@ -51,7 +53,7 @@ import scrobbles4j.server.model.WikimediaImage;
 @Path("/charts")
 public class ChartResource {
 
-	private final ManagedExecutor managedExecutor;
+	private final ExecutorService executorService;
 
 	private final ChartService chartService;
 
@@ -69,7 +71,7 @@ public class ChartResource {
 
 	/**
 	 * Create a new instance of this resource.
-	 * @param managedExecutor needed for a couple of database requests
+	 * @param executorService needed for a couple of database requests
 	 * @param chartService access to charts
 	 * @param artists access to artists
 	 * @param albums access to albums
@@ -79,10 +81,11 @@ public class ChartResource {
 	 * @param artistTemplate the artist view
 	 */
 	@Inject
-	public ChartResource(ManagedExecutor managedExecutor, ChartService chartService, Artists artists, Albums albums,
-			@Location("charts/index") Template indexTemplate, @Location("charts/year") Template yearTemplate,
-			@Location("charts/month") Template monthTemplate, @Location("charts/artist") Template artistTemplate) {
-		this.managedExecutor = managedExecutor;
+	public ChartResource(@VirtualThreads ExecutorService executorService, ChartService chartService, Artists artists,
+			Albums albums, @Location("charts/index") Template indexTemplate,
+			@Location("charts/year") Template yearTemplate, @Location("charts/month") Template monthTemplate,
+			@Location("charts/artist") Template artistTemplate) {
+		this.executorService = executorService;
 		this.chartService = chartService;
 		this.artists = artists;
 		this.albums = albums;
@@ -160,6 +163,7 @@ public class ChartResource {
 	@Path("/{year: (\\d+)}/{month: (\\d+)}")
 	@Produces(MediaType.TEXT_HTML)
 	@CacheResult(cacheName = "month-charts-cache")
+	@RunOnVirtualThread
 	public TemplateInstance month(@PathParam("year") Year year, @PathParam("month") int month) {
 		YearMonth yearMonth;
 		try {
@@ -174,10 +178,10 @@ public class ChartResource {
 		record NameAndImage(String name, Optional<WikimediaImage> image) {
 		}
 
-		var summary = CompletableFuture.supplyAsync(() -> this.chartService.getStats(yearMonth));
+		var summary = CompletableFuture.supplyAsync(() -> this.chartService.getStats(yearMonth), this.executorService);
 
 		var top5Artists = CompletableFuture
-			.supplyAsync(() -> this.chartService.getTopNArtists(5, yearMonth), this.managedExecutor)
+			.supplyAsync(() -> this.chartService.getTopNArtists(5, yearMonth), this.executorService)
 			.thenApply(rankedEntries -> rankedEntries.stream()
 				.map(entry -> this.artists.getImage(entry.value())
 					.thenApply(i -> new RankedEntry<>(entry.rank(), entry.cnt(),
@@ -185,10 +189,11 @@ public class ChartResource {
 				.map(CompletableFuture::join)
 				.toList());
 
-		var top1Tracks = CompletableFuture.supplyAsync(() -> this.chartService.getTop1Tracks(yearMonth));
+		var top1Tracks = CompletableFuture.supplyAsync(() -> this.chartService.getTop1Tracks(yearMonth),
+				this.executorService);
 
 		var top5Albums = CompletableFuture.supplyAsync(() -> this.chartService.getTopNAlbums(5, yearMonth),
-				this.managedExecutor);
+				this.executorService);
 
 		return this.monthTemplate.data("summary", summary)
 			.data("locale", Locale.ENGLISH)
@@ -208,6 +213,7 @@ public class ChartResource {
 	@Path("/artist")
 	@Produces(MediaType.TEXT_HTML)
 	@CacheResult(cacheName = "artist-charts-cache")
+	@RunOnVirtualThread
 	public TemplateInstance artist(@QueryParam("q") String q,
 			@QueryParam("includeCompilations") @DefaultValue("true") boolean includeCompilations) {
 
@@ -223,13 +229,13 @@ public class ChartResource {
 
 		var topTracks = CompletableFuture.supplyAsync(
 				() -> this.chartService.getTopNTracks(20, Optional.empty(), Optional.of(artist), includeCompilations),
-				this.managedExecutor);
+				this.executorService);
 
 		var albumsByArtists = CompletableFuture.supplyAsync(() -> this.albums.findByArtist(artist),
-				this.managedExecutor);
+				this.executorService);
 
 		var relatedArtists = CompletableFuture.supplyAsync(() -> this.artists.findRelated(artist),
-				this.managedExecutor);
+				this.executorService);
 
 		return this.artistTemplate.data("includeCompilations", includeCompilations)
 			.data("artist", artist)

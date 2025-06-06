@@ -12,12 +12,11 @@ image:https://github.com/michael-simons/scrobbles4j/workflows/build/badge.svg[li
 
 === For building the project
 
-* JDK 17
+* JDK 24
 
 === For using the client
 
 * An Apple macOS device, running iTunes, Apple Music or the Spotify app.
-
 
 == Building and running
 

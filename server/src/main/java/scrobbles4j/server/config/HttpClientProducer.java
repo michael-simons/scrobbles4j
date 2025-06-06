@@ -16,10 +16,11 @@
 package scrobbles4j.server.config;
 
 import java.net.http.HttpClient;
+import java.util.concurrent.ExecutorService;
 
+import io.quarkus.virtual.threads.VirtualThreads;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Singleton;
-import org.eclipse.microprofile.context.ManagedExecutor;
 
 /**
  * Creates a global instance of {@link java.net.http.HttpClient} configured to use the
@@ -29,20 +30,23 @@ import org.eclipse.microprofile.context.ManagedExecutor;
  */
 public final class HttpClientProducer {
 
+	HttpClientProducer() {
+	}
+
 	/**
 	 * Creates a new Http client using the same executor as Quarkus.
-	 * @param managedExecutor a managed executor passed to the http client for executing
+	 * @param executorService a managed executor passed to the http client for executing
 	 * asynchronous requests
 	 * @return a HTTP client
 	 */
 	@Produces
 	@Singleton
-	public HttpClient httpClient(ManagedExecutor managedExecutor) {
+	public HttpClient httpClient(@VirtualThreads ExecutorService executorService) {
 
 		return HttpClient.newBuilder()
 			.version(HttpClient.Version.HTTP_1_1)
 			.followRedirects(HttpClient.Redirect.NORMAL)
-			.executor(managedExecutor)
+			.executor(executorService)
 			.build();
 	}
 

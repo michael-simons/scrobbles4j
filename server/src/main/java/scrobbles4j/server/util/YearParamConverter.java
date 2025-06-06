@@ -61,6 +61,12 @@ public final class YearParamConverter implements ParamConverter<Year> {
 
 		private final YearParamConverter instance = new YearParamConverter();
 
+		/**
+		 * This constructor is required for CDI to work.
+		 */
+		public YearParamConverterProvider() {
+		}
+
 		@SuppressWarnings("unchecked")
 		@Override
 		public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {

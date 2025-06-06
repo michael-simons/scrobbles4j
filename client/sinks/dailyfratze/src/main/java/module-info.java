@@ -16,6 +16,7 @@
 import scrobbles4j.client.sinks.dailyfratze.DailyFratze;
 
 /**
+ * This module calls a REST API on <a href="https://dailyfratze.de">dailyfratze.de</a> for scrobbling.
  * @author Michael J. Simons
  */
 module scrobbles4j.client.sinks.dailyfratze {

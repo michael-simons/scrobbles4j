@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 /**
+ * This module combines all known sources and sinks into a standalone app, that can listen to either Apple iTunes, Music or both and log the tracks received.
  * @author Michael J. Simons
  */
 module scrobbles4j.client.app {

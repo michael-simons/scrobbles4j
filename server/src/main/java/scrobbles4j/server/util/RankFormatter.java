@@ -54,6 +54,12 @@ public final class RankFormatter {
 	@Singleton
 	public static class RankFormatterSupplier implements Supplier<RankFormatter> {
 
+		/**
+		 * This constructor is required for CDI to work.
+		 */
+		public RankFormatterSupplier() {
+		}
+
 		@Override
 		public RankFormatter get() {
 			return new RankFormatter();

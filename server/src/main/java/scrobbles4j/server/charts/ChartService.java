@@ -126,7 +126,7 @@ final class ChartService {
 				)
 				SELECT * FROM unfiltered
 				WHERE year >= :minYear
-				ORDER BY year DESC, rank ASC, artist ASC
+				ORDER BY year DESC, rank, artist
 				""";
 
 		var currentYear = ZonedDateTime.now().getYear();
@@ -173,7 +173,7 @@ final class ChartService {
 				  HAVING count(*) >= 2
 				) src
 				WHERE rank <= :maxRank
-				ORDER BY rank ASC
+				ORDER BY rank
 				""";
 
 		return this.db.withHandle(handle -> {
@@ -219,7 +219,7 @@ final class ChartService {
 				  HAVING count(*) >= 2
 				) src
 				WHERE rank <= :maxRank
-				ORDER BY rank ASC
+				ORDER BY rank
 				""";
 
 		return this.db.withHandle(handle -> handle.createQuery(statement)
@@ -251,7 +251,7 @@ final class ChartService {
 				  GROUP BY a.artist, t.album
 				) src
 				WHERE rank <= :maxRank
-				ORDER BY rank ASC
+				ORDER BY rank
 				""";
 
 		return this.db.withHandle(handle -> {
@@ -357,7 +357,8 @@ final class ChartService {
 				    FROM plays p
 				    JOIN tracks t ON t.id = p.track_id
 				    JOIN artists a ON a.id = t.artist_id
-				    WHERE year(p.played_on) = :year and month(p.played_on) = :month
+				    WHERE a.artist <> 'Various'
+				      AND year(p.played_on) = :year and month(p.played_on) = :month
 				    GROUP BY a.artist, a.wikipedia_link
 				) src
 				WHERE rank <= :maxRank
@@ -395,7 +396,7 @@ final class ChartService {
 				  GROUP BY a.artist
 				) src
 				WHERE rank <= :maxRank
-				ORDER BY rank ASC
+				ORDER BY rank
 				""";
 
 		return this.db.withHandle(handle -> handle.createQuery(statement)

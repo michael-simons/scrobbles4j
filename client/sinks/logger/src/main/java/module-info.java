@@ -16,6 +16,7 @@
 import scrobbles4j.client.sinks.logger.LoggingSink;
 
 /**
+ * This module provides a sink that logs to standard out via jul.
  * @author Michael J. Simons
  */
 module scrobbles4j.client.sinks.logger {
