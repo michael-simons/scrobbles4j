@@ -23,10 +23,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.quarkus.cache.CacheResult;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.jdbi.v3.core.Jdbi;
@@ -77,76 +77,85 @@ public final class Artists {
 	/**
 	 * Retrieves the summary from the Artists main wikipedia page if available.
 	 * @param artist the artist to retrieve the summary for
-	 * @return an optional future summary
+	 * @return an optional summary
 	 */
-	public CompletableFuture<Optional<String>> getSummary(Artist artist) {
+	@CacheResult(cacheName = "artist-summary")
+	public Optional<String> getSummary(Artist artist) {
 
 		var wikipediaLink = artist.wikipediaLink();
 		if (wikipediaLink == null) {
-			return CompletableFuture.completedFuture(Optional.empty());
+			return Optional.empty();
 		}
 		var langAndTitle = extractLanguageAndTitle(wikipediaLink);
 		var api = URI.create("https://%s.wikipedia.org/api/rest_v1/page/summary/%s".formatted(langAndTitle.lang(),
 				langAndTitle.title()));
-		return this.httpClient
-			.sendAsync(HttpRequest.newBuilder().uri(api).build(), HttpResponse.BodyHandlers.ofInputStream())
-			.thenApply(response -> {
-				if (response.statusCode() != 200) {
-					return Optional.empty();
-				}
-				try {
-					var summary = this.objectMapper.readTree(response.body());
-					return Optional.of(summary.get("extract").textValue());
-				}
-				catch (IOException ex) {
-					throw new UncheckedIOException(ex);
-				}
-			});
+		try {
+			var response = this.httpClient.send(HttpRequest.newBuilder().uri(api).build(),
+					HttpResponse.BodyHandlers.ofInputStream());
+			if (response.statusCode() != 200) {
+				return Optional.empty();
+			}
+			var summary = this.objectMapper.readTree(response.body());
+			return Optional.of(summary.get("extract").textValue());
+		}
+		catch (IOException ex) {
+			throw new UncheckedIOException(ex);
+		}
+		catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			return Optional.empty();
+		}
+
 	}
 
 	/**
 	 * Retrieves a Wikimedia image for a given artist.
 	 * @param artist the artist for which the lead image should be returned
-	 * @return a wikimedia image
+	 * @return an optional wikimedia image
 	 */
-	public CompletableFuture<Optional<WikimediaImage>> getImage(Artist artist) {
+	@CacheResult(cacheName = "artist-image")
+	public Optional<WikimediaImage> getImage(Artist artist) {
+
 		var wikipediaLink = artist.wikipediaLink();
 		if (wikipediaLink == null) {
-			return CompletableFuture.completedFuture(Optional.empty());
+			return Optional.empty();
 		}
 		var langAndTitle = extractLanguageAndTitle(wikipediaLink);
 		var api = URI.create("https://%s.wikipedia.org/api/rest_v1/page/media-list/%s".formatted(langAndTitle.lang(),
 				langAndTitle.title()));
-		return this.httpClient
-			.sendAsync(HttpRequest.newBuilder().uri(api).build(), HttpResponse.BodyHandlers.ofInputStream())
-			.thenApply(response -> {
-				if (response.statusCode() != 200) {
-					return Optional.empty();
-				}
-				try {
-					var mediaList = this.objectMapper.readTree(response.body());
-					JsonNode image = null;
-					for (var item : mediaList.get("items")) {
-						if (!"image".equals(item.get("type").asText())) {
-							continue;
-						}
-						if (image == null) {
-							image = item;
-						}
-						if (item.get("leadImage").asBoolean()) {
-							image = item;
-							break;
-						}
-					}
+		try {
+			var response = this.httpClient.send(HttpRequest.newBuilder().uri(api).build(),
+					HttpResponse.BodyHandlers.ofInputStream());
 
-					return Optional.ofNullable(image)
-						.map(v -> new WikimediaImage(wikipediaLink,
-								URI.create("https:%s".formatted(v.get("srcset").get(0).get("src").asText()))));
+			if (response.statusCode() != 200) {
+				return Optional.empty();
+			}
+			var mediaList = this.objectMapper.readTree(response.body());
+			JsonNode image = null;
+			for (var item : mediaList.get("items")) {
+				if (!"image".equals(item.get("type").asText())) {
+					continue;
 				}
-				catch (IOException ex) {
-					throw new UncheckedIOException(ex);
+				if (image == null) {
+					image = item;
 				}
-			});
+				if (item.get("leadImage").asBoolean()) {
+					image = item;
+					break;
+				}
+			}
+
+			return Optional.ofNullable(image)
+				.map(v -> new WikimediaImage(wikipediaLink,
+						URI.create("https:%s".formatted(v.get("srcset").get(0).get("src").asText()))));
+		}
+		catch (IOException ex) {
+			throw new UncheckedIOException(ex);
+		}
+		catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			return Optional.empty();
+		}
 	}
 
 	private static LanguageAndTitle extractLanguageAndTitle(URI wikipediaLink) {

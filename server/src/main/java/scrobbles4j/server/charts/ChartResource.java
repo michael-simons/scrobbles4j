@@ -15,7 +15,6 @@
  */
 package scrobbles4j.server.charts;
 
-import java.time.DateTimeException;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -23,15 +22,17 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Predicate;
 
-import io.quarkus.cache.CacheResult;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.virtual.threads.VirtualThreads;
 import io.smallrye.common.annotation.RunOnVirtualThread;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -162,31 +163,20 @@ public class ChartResource {
 	@GET
 	@Path("/{year: (\\d+)}/{month: (\\d+)}")
 	@Produces(MediaType.TEXT_HTML)
-	@CacheResult(cacheName = "month-charts-cache")
 	@RunOnVirtualThread
-	public TemplateInstance month(@PathParam("year") Year year, @PathParam("month") int month) {
-		YearMonth yearMonth;
-		try {
-			yearMonth = year.atMonth(month);
-		}
-		catch (DateTimeException ex) {
-			throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
-				.entity("%d is not a valid month.".formatted(month))
-				.build());
-		}
+	public TemplateInstance month(@PathParam("year") Year year, @Min(1) @Max(12) @PathParam("month") int month) {
 
 		record NameAndImage(String name, Optional<WikimediaImage> image) {
 		}
 
+		var yearMonth = year.atMonth(month);
 		var summary = CompletableFuture.supplyAsync(() -> this.chartService.getStats(yearMonth), this.executorService);
 
 		var top5Artists = CompletableFuture
 			.supplyAsync(() -> this.chartService.getTopNArtists(5, yearMonth), this.executorService)
 			.thenApply(rankedEntries -> rankedEntries.stream()
-				.map(entry -> this.artists.getImage(entry.value())
-					.thenApply(i -> new RankedEntry<>(entry.rank(), entry.cnt(),
-							new NameAndImage(entry.value().name(), i))))
-				.map(CompletableFuture::join)
+				.map(entry -> new RankedEntry<>(entry.rank(), entry.cnt(),
+						new NameAndImage(entry.value().name(), this.artists.getImage(entry.value()))))
 				.toList());
 
 		var top1Tracks = CompletableFuture.supplyAsync(() -> this.chartService.getTop1Tracks(yearMonth),
@@ -204,7 +194,7 @@ public class ChartResource {
 
 	/**
 	 * Charts per artist.
-	 * @param q required query parameter for selecting the artist
+	 * @param artistName required query parameter for selecting the artist
 	 * @param includeCompilations flag if compilations should be included while computing
 	 * the track list
 	 * @return a view
@@ -212,20 +202,15 @@ public class ChartResource {
 	@GET
 	@Path("/artist")
 	@Produces(MediaType.TEXT_HTML)
-	@CacheResult(cacheName = "artist-charts-cache")
 	@RunOnVirtualThread
-	public TemplateInstance artist(@QueryParam("q") String q,
+	public TemplateInstance artist(@NotNull @NotBlank @QueryParam("q") String artistName,
 			@QueryParam("includeCompilations") @DefaultValue("true") boolean includeCompilations) {
-
-		var artistName = Optional.ofNullable(q)
-			.map(String::trim)
-			.filter(Predicate.not(String::isBlank))
-			.orElseThrow(() -> new WebApplicationException(
-					Response.status(Response.Status.BAD_REQUEST).entity("Query parameter is mandatory.").build()));
 
 		var artist = this.artists.findByName(artistName)
 			.orElseThrow(() -> new WebApplicationException(
 					Response.status(Response.Status.NOT_FOUND).entity("No such artist.").build()));
+
+		var summary = CompletableFuture.supplyAsync(() -> this.artists.getSummary(artist), this.executorService);
 
 		var topTracks = CompletableFuture.supplyAsync(
 				() -> this.chartService.getTopNTracks(20, Optional.empty(), Optional.of(artist), includeCompilations),
@@ -239,7 +224,7 @@ public class ChartResource {
 
 		return this.artistTemplate.data("includeCompilations", includeCompilations)
 			.data("artist", artist)
-			.data("summary", this.artists.getSummary(artist))
+			.data("summary", summary)
 			.data("image", this.artists.getImage(artist))
 			.data("topTracks", topTracks)
 			.data("albumsByArtists", albumsByArtists)
