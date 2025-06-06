@@ -27,7 +27,6 @@ import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.virtual.threads.VirtualThreads;
-import io.smallrye.common.annotation.RunOnVirtualThread;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -163,7 +162,6 @@ public class ChartResource {
 	@GET
 	@Path("/{year: (\\d+)}/{month: (\\d+)}")
 	@Produces(MediaType.TEXT_HTML)
-	@RunOnVirtualThread
 	public TemplateInstance month(@PathParam("year") Year year, @Min(1) @Max(12) @PathParam("month") int month) {
 
 		record NameAndImage(String name, Optional<WikimediaImage> image) {
@@ -202,7 +200,6 @@ public class ChartResource {
 	@GET
 	@Path("/artist")
 	@Produces(MediaType.TEXT_HTML)
-	@RunOnVirtualThread
 	public TemplateInstance artist(@NotNull @NotBlank @QueryParam("q") String artistName,
 			@QueryParam("includeCompilations") @DefaultValue("true") boolean includeCompilations) {
 
