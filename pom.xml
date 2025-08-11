@@ -56,7 +56,7 @@
 	</modules>
 
 	<properties>
-		<assertj.version>3.27.3</assertj.version>
+		<assertj.version>3.27.4</assertj.version>
 		<byte-buddy.version>1.17.6</byte-buddy.version>
 		<checkstyle.version>10.26.1</checkstyle.version>
 		<jdbi3.version>3.49.5</jdbi3.version>
