@@ -292,7 +292,7 @@ final class ChartService {
 			.bind("maxRank", maxRank)
 			.bind("year", month.getYear())
 			.bind("month", month.getMonthValue())
-			.map((rs, ctx) -> new RankedEntry<>(rs.getInt("rank"), rs.getInt("cnt"),
+			.map((rs, _) -> new RankedEntry<>(rs.getInt("rank"), rs.getInt("cnt"),
 					new Album(rs.getString("album"), rs.getInt("year"))))
 			.collectIntoList());
 	}
