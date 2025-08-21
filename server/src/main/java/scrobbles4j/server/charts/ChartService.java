@@ -285,7 +285,7 @@ final class ChartService {
 				  GROUP BY a.artist, t.album
 				) src
 				WHERE rank <= :maxRank
-				ORDER BY rank ASC
+				ORDER BY rank, album
 				""";
 
 		return this.db.withHandle(handle -> handle.createQuery(statement)
